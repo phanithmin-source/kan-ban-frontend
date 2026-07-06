@@ -1,6 +1,8 @@
 ﻿import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
+import { AlertTriangle, Inbox, Loader2 } from "lucide-react";
 import Button from "../../components/common/Button";
+import StatePanel from "../../components/common/StatePanel";
 import { useAuth } from "../../hooks/useAuth";
 import ShareButton from "../../components/common/ShareButton";
 
@@ -60,7 +62,7 @@ const DASHBOARD_OVERVIEW_QUERY = gql`
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
-  const { data, loading, error } = useQuery<DashboardOverviewData>(
+  const { data, loading, error, refetch } = useQuery<DashboardOverviewData>(
     DASHBOARD_OVERVIEW_QUERY,
     {
       skip: authLoading,
@@ -176,17 +178,26 @@ export default function Dashboard() {
           </div>
 
           {loading ? (
-            <div className="mt-6 rounded-3xl bg-slate-50 p-6 text-sm text-slate-600">
-              Loading boards...
-            </div>
+            <StatePanel
+              icon={<Loader2 className="h-6 w-6 animate-spin" />}
+              title="Loading boards"
+              description="Fetching your latest boards and task summaries."
+            />
           ) : error ? (
-            <div className="mt-6 rounded-3xl bg-rose-50 p-6 text-sm text-rose-700">
-              Unable to load boards.
-            </div>
+            <StatePanel
+              icon={<AlertTriangle className="h-6 w-6" />}
+              title="Unable to load dashboard"
+              description="There was a problem loading your boards. Try again to refresh the dashboard."
+              actionLabel="Retry"
+              onAction={() => void refetch()}
+              buttonVariant="secondary"
+            />
           ) : boardsCount === 0 ? (
-            <div className="mt-6 rounded-3xl bg-slate-50 p-6 text-sm text-slate-600">
-              No boards available yet.
-            </div>
+            <StatePanel
+              icon={<Inbox className="h-6 w-6" />}
+              title="No boards yet"
+              description="Create a board to start organizing work and tracking tasks."
+            />
           ) : (
             <div className="mt-6 space-y-4">
               {boards.slice(0, 3).map((board) => (

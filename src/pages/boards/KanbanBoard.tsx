@@ -4,7 +4,9 @@ import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { AlertTriangle, Inbox, Loader2 } from "lucide-react";
 import Button from "../../components/common/Button";
+import StatePanel from "../../components/common/StatePanel";
 import TaskCard from "../../components/task/TaskCard";
 import TaskForm from "../../components/task/TaskForm";
 import { type Task, type TaskStatus } from "../../types/task";
@@ -324,17 +326,26 @@ export default function KanbanBoard() {
       ) : null}
 
       {loading ? (
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">
-          Loading tasks...
-        </div>
+        <StatePanel
+          icon={<Loader2 className="h-6 w-6 animate-spin" />}
+          title="Loading tasks"
+          description="Fetching tasks from your boards. This should only take a moment."
+        />
       ) : error ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-8 text-center text-rose-700 shadow-sm">
-          Failed to load tasks.
-        </div>
+        <StatePanel
+          icon={<AlertTriangle className="h-6 w-6" />}
+          title="Failed to load tasks"
+          description="There was an issue loading your tasks. Refresh or try again later."
+          actionLabel="Retry"
+          onAction={() => void refetch()}
+          buttonVariant="secondary"
+        />
       ) : filteredTasks.length === 0 ? (
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">
-          No tasks match the current filters. Adjust search or priority to continue.
-        </div>
+        <StatePanel
+          icon={<Inbox className="h-6 w-6" />}
+          title="No tasks found"
+          description="Try a different search or filter to discover tasks in your board."
+        />
       ) : (
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div className="grid gap-6 lg:grid-cols-4">
