@@ -1,40 +1,52 @@
-﻿import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import Button from "../../components/common/Button";
 import { useAuth } from "../../hooks/useAuth";
 
+const registerSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type RegisterFields = z.infer<typeof registerSchema>;
+
 export default function Register() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFields>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: RegisterFields) => {
     setError(null);
-    setSubmitting(true);
 
     try {
-      await signUp(name, email, password);
+      await signUp(data.name, data.email, data.password);
       navigate("/", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
-    } finally {
-      setSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6">
-      {/* rounded-3xl to match Login.tsx exactly (was rounded-[2rem] here — same value, but keep one spelling app-wide) */}
       <div className="mx-auto flex max-w-5xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.06)] sm:flex-row">
-        {/* same gradient direction + colors as Login.tsx — was from-secondary/30 via-secondary/20 to-primary/10,
-            which faded to near-white at the bottom and made a different-looking panel per page */}
         <div className="hidden flex-1 bg-linear-to-br from-primary via-primary/80 to-secondary p-10 text-white sm:flex sm:flex-col sm:justify-center">
           <div className="rounded-3xl border border-white/20 bg-white/10 p-8 backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.32em] text-secondary">Create your account</p>
@@ -52,7 +64,7 @@ export default function Register() {
             <p className="mt-2 text-sm text-slate-600">Sign up and start organizing your workflow today.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="name">
                 Name
@@ -61,11 +73,12 @@ export default function Register() {
                 id="name"
                 type="text"
                 autoComplete="name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
+                {...register("name")}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                required
               />
+              {errors.name ? (
+                <p className="mt-1 text-xs text-danger">{errors.name.message}</p>
+              ) : null}
             </div>
 
             <div>
@@ -76,11 +89,12 @@ export default function Register() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                {...register("email")}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                required
               />
+              {errors.email ? (
+                <p className="mt-1 text-xs text-danger">{errors.email.message}</p>
+              ) : null}
             </div>
 
             <div>
@@ -91,11 +105,12 @@ export default function Register() {
                 id="password"
                 type="password"
                 autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                {...register("password")}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                required
               />
+              {errors.password ? (
+                <p className="mt-1 text-xs text-danger">{errors.password.message}</p>
+              ) : null}
             </div>
 
             {error ? (
@@ -104,10 +119,10 @@ export default function Register() {
 
             <Button
               type="submit"
-              disabled={submitting}
+              disabled={isSubmitting}
               className="w-full justify-center rounded-2xl bg-primary text-white shadow-sm shadow-primary/30 hover:bg-primary/90 disabled:opacity-60"
             >
-              {submitting ? "Registering..." : "Register"}
+              {isSubmitting ? "Registering..." : "Register"}
             </Button>
           </form>
 

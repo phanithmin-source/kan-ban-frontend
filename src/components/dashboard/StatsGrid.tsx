@@ -3,8 +3,9 @@ import {
   ClipboardList,
   Clock3,
   FolderKanban,
+  Users,
 } from "lucide-react";
-
+import { useAuth } from "../../hooks/useAuth";
 import StatCard from "./StatCard";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
   tasks: number;
   progress: number;
   completed: number;
+  users?: number;
 }
 
 export default function StatsGrid({
@@ -19,26 +21,37 @@ export default function StatsGrid({
   tasks,
   progress,
   completed,
+  users = 0,
 }: Props) {
+  const { user } = useAuth();
+
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title="Boards"
+        title={user?.role === "ADMIN" ? "System Boards" : "My Boards"}
         value={boards}
         icon={FolderKanban}
       />
 
       <StatCard
-        title="Tasks"
+        title={user?.role === "ADMIN" ? "System Tasks" : "Total Tasks"}
         value={tasks}
         icon={ClipboardList}
       />
 
-      <StatCard
-        title="In Progress"
-        value={progress}
-        icon={Clock3}
-      />
+      {user?.role === "ADMIN" ? (
+        <StatCard
+          title="Total Users"
+          value={users}
+          icon={Users}
+        />
+      ) : (
+        <StatCard
+          title="In Progress"
+          value={progress}
+          icon={Clock3}
+        />
+      )}
 
       <StatCard
         title="Completed"

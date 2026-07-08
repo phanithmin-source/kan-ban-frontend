@@ -1,23 +1,19 @@
+import { useAuth } from "../../hooks/useAuth";
 import TaskRow from "./TaskRow";
 import EmptyState from "./EmptyState";
-
-import type {
-  TasksQuery,
-} from "../../gql/graphql";
-
+import type { DashboardTasksQuery } from "../../gql/graphql";
 
 type RecentTask =
-  TasksQuery["tasks"]["data"][number];
-
+  DashboardTasksQuery["tasks"]["data"][number];
 
 interface Props {
   tasks: RecentTask[];
 }
 
-
 export default function RecentTasks({
   tasks,
 }: Props) {
+  const { user } = useAuth();
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -33,7 +29,11 @@ export default function RecentTasks({
 
           <EmptyState
             title="No tasks yet"
-            description="Create your first task to get started."
+            description={
+              user?.role === "USER"
+                ? "You do not have any tasks assigned to you yet. Ask your manager to assign you to a board."
+                : "Create your first task to get started."
+            }
           />
 
         ) : (

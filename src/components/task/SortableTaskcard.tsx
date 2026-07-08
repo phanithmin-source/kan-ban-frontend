@@ -11,6 +11,7 @@ interface SortableTaskCardProps {
   onMoveRight?: (task: Task) => void;
   canMoveLeft?: boolean;
   canMoveRight?: boolean;
+  disabled?: boolean;
 }
 
 export default function SortableTaskCard({
@@ -21,9 +22,11 @@ export default function SortableTaskCard({
   onMoveRight,
   canMoveLeft,
   canMoveRight,
+  disabled,
 }: SortableTaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
+    disabled,
   });
 
   const style = {

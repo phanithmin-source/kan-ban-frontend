@@ -1,0 +1,49 @@
+# =========================
+# Fragments
+# =========================
+
+fragment UserFields on User {
+  id
+  name
+  email
+  role
+  createdAt
+  updatedAt
+}
+
+# =========================
+# Queries
+# =========================
+
+query GetUsers {
+  users {
+    id
+    name
+    email
+    role
+  }
+}
+
+query GetUser($id: ID!) {
+  user(id: $id) {
+    ...UserFields
+    boards {
+      id
+      name
+    }
+  }
+}
+
+# =========================
+# Mutations
+# =========================
+
+mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    ...UserFields
+  }
+}
+
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
+}

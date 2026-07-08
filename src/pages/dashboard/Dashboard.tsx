@@ -1,4 +1,4 @@
-﻿import DashboardHeader from "../../components/dashboard/DashboardHeader";
+import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import StatsGrid from "../../components/dashboard/StatsGrid";
 import QuickActions from "../../components/dashboard/QuickActions";
 import RecentTasks from "../../components/dashboard/RecentTasks";
@@ -63,6 +63,7 @@ if (error) {
         tasks={dashboard.tasks}
         progress={dashboard.progress}
         completed={dashboard.completed}
+        users={dashboard.users}
       />
 
 

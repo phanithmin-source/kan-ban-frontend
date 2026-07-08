@@ -6,7 +6,8 @@ import { type Task } from "../../types/task";
 function formatDate(value: string | null | undefined) {
   if (!value) return null;
 
-  const date = new Date(value);
+  const num = Number(value);
+  const date = !Number.isNaN(num) && String(num) === value.trim() ? new Date(num) : new Date(value);
   if (Number.isNaN(date.getTime())) return value;
 
   return new Intl.DateTimeFormat("en-US", {

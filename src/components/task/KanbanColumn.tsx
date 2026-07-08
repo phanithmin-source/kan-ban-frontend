@@ -9,9 +9,11 @@ interface KanbanColumnProps {
   tasks: Task[];
   statusOrder: TaskStatus[];
   onView: (task: Task) => void;
-  onEdit: (task: Task) => void;
-  onMoveLeft: (task: Task) => void;
-  onMoveRight: (task: Task) => void;
+  onEdit?: (task: Task) => void;
+  onMoveLeft?: (task: Task) => void;
+  onMoveRight?: (task: Task) => void;
+  disabled?: boolean;
+  currentUserId?: string;
 }
 
 export default function KanbanColumn({
@@ -23,6 +25,8 @@ export default function KanbanColumn({
   onEdit,
   onMoveLeft,
   onMoveRight,
+  disabled,
+  currentUserId,
 }: KanbanColumnProps) {
   // Registers the column itself (not just its tasks) as a drop target, so
   // dragging a card onto an EMPTY column works. Without this, only dropping
@@ -52,18 +56,22 @@ export default function KanbanColumn({
               Drop a task here
             </p>
           ) : (
-            tasks.map((task) => (
-              <SortableTaskCard
-                key={task.id}
-                task={task}
-                onView={onView}
-                onEdit={onEdit}
-                onMoveLeft={onMoveLeft}
-                onMoveRight={onMoveRight}
-                canMoveLeft={statusOrder.indexOf(task.status) > 0}
-                canMoveRight={statusOrder.indexOf(task.status) < statusOrder.length - 1}
-              />
-            ))
+            tasks.map((task) => {
+              const canUserModify = !disabled && (currentUserId === undefined || Number(task.assignee?.id) === Number(currentUserId));
+              return (
+                <SortableTaskCard
+                  key={task.id}
+                  task={task}
+                  onView={onView}
+                  onEdit={canUserModify ? onEdit : undefined}
+                  onMoveLeft={canUserModify ? onMoveLeft : undefined}
+                  onMoveRight={canUserModify ? onMoveRight : undefined}
+                  canMoveLeft={statusOrder.indexOf(task.status) > 0}
+                  canMoveRight={statusOrder.indexOf(task.status) < statusOrder.length - 1}
+                  disabled={!canUserModify}
+                />
+              );
+            })
           )}
         </div>
       </SortableContext>

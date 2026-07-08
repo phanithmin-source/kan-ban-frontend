@@ -1,12 +1,5 @@
-export type TaskStatus = "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
-export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
+import type { BoardQuery, TaskStatus, TaskPriority } from "../gql/graphql";
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  dueDate: string;
-  createdAt: string;
-}
+export type { TaskStatus, TaskPriority };
+
+export type Task = NonNullable<BoardQuery["board"]>["tasks"][number];

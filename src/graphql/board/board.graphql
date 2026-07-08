@@ -26,9 +26,11 @@ query Board($id: ID!) {
     tasks {
       id
       title
+      description
       status
       priority
       dueDate
+      createdAt
       assignee {
         id
         name

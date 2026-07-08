@@ -109,10 +109,13 @@ mutation DeleteTask($id: ID!) {
   deleteTask(id: $id)
 }
 
-mutation DeleteTask($id: ID!) {
-  deleteTask(id: $id)
-}
-
-mutation DeleteTask($id: ID!) {
-  deleteTask(id: $id)
-}
+mutation AssignTask($taskId: ID!, $userId: ID!) {
+  assignTask(taskId: $taskId, userId: $userId) {
+    id
+    assignee {
+      id
+      name
+      email
+    }
+  }
+}
