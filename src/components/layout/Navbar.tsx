@@ -5,6 +5,7 @@ import clsx from "clsx";
 import Button from "../common/Button";
 import { useAuth } from "../../hooks/useAuth";
 import logoUrl from "../../assets/kanban-logo.svg";
+import ThemeToggle from "./ThemeToggle";
 
 type Role = "USER" | "MANAGER" | "ADMIN";
 
@@ -82,7 +83,7 @@ function NavItem({
         "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200",
         active
           ? "bg-primary/10 text-primary"
-          : "text-slate-700 hover:bg-slate-100 hover:text-primary"
+          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary dark:hover:text-primary"
       )}
     >
       <Icon className="h-4 w-4" />
@@ -99,24 +100,24 @@ export default function Navbar() {
   const links = visibleLinks(user?.role as Role | undefined);
 
   return (
-    <nav className="border-b border-slate-200 bg-slate-50 px-4 py-4 shadow-sm">
+    <nav className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 shadow-sm backdrop-blur-xs">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
         <div className="flex flex-1 items-center justify-between gap-4">
           <Link
             to="/"
-            className="flex items-center gap-3 rounded-3xl border border-slate-200 bg-white px-4 py-2 text-slate-900 shadow-sm transition hover:border-slate-300"
+            className="flex items-center gap-3 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2 text-slate-900 dark:text-slate-100 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700"
           >
             <img src={logoUrl} alt="Kanban logo" className="h-10 w-10" />
             <div>
-              <div className="text-base font-semibold text-slate-900">Kanban Task Manager</div>
-              <div className="text-sm text-slate-500">Organize your workflow</div>
+              <div className="text-base font-semibold text-slate-900 dark:text-slate-100">Kanban Task Manager</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">Organize your workflow</div>
             </div>
           </Link>
 
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-slate-300 md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700 md:hidden"
             aria-label="Toggle navigation"
             aria-expanded={menuOpen}
           >
@@ -130,10 +131,11 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 border-l border-slate-200 pl-4 md:flex">
+        <div className="hidden items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-4 md:flex">
+          <ThemeToggle />
           {user ? (
             <>
-              <span className="flex items-center gap-2 text-sm text-slate-700">
+              <span className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
                   {initials(user.name)}
                 </span>
@@ -162,7 +164,7 @@ export default function Navbar() {
       </div>
 
       {menuOpen ? (
-        <div className="mt-3 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm md:hidden">
+        <div className="mt-3 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 shadow-sm md:hidden">
           <div className="flex flex-col gap-3">
             {links.map((link) => (
               <NavItem
@@ -173,10 +175,15 @@ export default function Navbar() {
               />
             ))}
 
-            <div className="border-t border-slate-200 pt-4">
+            <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Theme</span>
+              <ThemeToggle />
+            </div>
+
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
               {user ? (
                 <>
-                  <div className="mb-3 flex items-center gap-2 text-sm text-slate-700">
+                  <div className="mb-3 flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
                       {initials(user.name)}
                     </span>

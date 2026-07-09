@@ -5,6 +5,7 @@ import { ApolloProvider } from "@apollo/client/react";
 import App from "./App";
 import { client } from "./apollo/client";
 import { AuthProvider } from "./context/AuthProvider";
+import { ThemeProvider } from "./context/ThemeProvider";
 import "./index.css";
 
 ReactDOM.createRoot(
@@ -12,9 +13,11 @@ ReactDOM.createRoot(
 ).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ThemeProvider>
     </ApolloProvider>
   </React.StrictMode>
 );

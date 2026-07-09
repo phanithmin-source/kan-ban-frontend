@@ -29,7 +29,7 @@ export default function DashboardHeader({
       </div>
 
       <h1 className="text-3xl font-bold text-slate-900">
-        {greeting}, {name} 👋
+        {greeting}, {name} 
       </h1>
 
       <p className="text-slate-500">

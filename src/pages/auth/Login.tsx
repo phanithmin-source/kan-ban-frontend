@@ -44,8 +44,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6">
-      <div className="mx-auto flex max-w-5xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.06)] sm:flex-row">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-150 px-4 py-12 sm:px-6">
+      <div className="mx-auto flex max-w-5xl flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-[0_20px_50px_rgba(15,23,42,0.06)] sm:flex-row">
         <div className="hidden flex-1 bg-linear-to-br from-primary via-primary/80 to-secondary p-10 text-white sm:flex sm:flex-col sm:justify-center">
           <div className="rounded-3xl border border-white/20 bg-white/10 p-8 backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.32em] text-secondary">Welcome back</p>
@@ -59,13 +59,13 @@ export default function Login() {
         <div className="w-full p-8 sm:p-12">
           <div className="mb-8">
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-primary">Sign in</p>
-            <h1 className="mt-3 text-3xl font-semibold text-slate-900">Welcome back</h1>
-            <p className="mt-2 text-sm text-slate-600">Enter your details to continue to your task dashboard.</p>
+            <h1 className="mt-3 text-3xl font-semibold text-foreground">Welcome back</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Enter your details to continue to your task dashboard.</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="email">
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="email">
                 Email
               </label>
               <Input
@@ -79,7 +79,7 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="password">
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="password">
                 Password
               </label>
               <Input
@@ -105,7 +105,7 @@ export default function Login() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             New here?{' '}
             <Link to="/register" className="font-semibold text-primary hover:text-secondary">
               Create an account
