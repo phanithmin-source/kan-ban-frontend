@@ -1,10 +1,9 @@
 import { Loader2, AlertTriangle, Inbox } from "lucide-react";
-import StatePanel from "../common/StatePanel";
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "../ui/Table";
-import { Badge } from "../ui/Badge";
-import Pagination from "../ui/Pagination";
+import { StatePanel } from "../common";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Badge, Pagination } from "../ui";
 import { type TasksQuery } from "../../gql/graphql";
 import { type Task } from "../../types/task";
+import { formatDate } from "@/lib/formatDate";
 
 interface BoardListViewProps {
     loading: boolean;
@@ -16,21 +15,6 @@ interface BoardListViewProps {
     setActiveTask: (task: Task | null) => void;
     refetchList: () => Promise<unknown>;
     clearFilters: () => void;
-}
-
-function formatDate(value: string | null | undefined) {
-    if (!value) return "";
-    try {
-        const d = new Date(value);
-        if (isNaN(d.getTime())) return "";
-        return d.toLocaleDateString(undefined, {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-    } catch {
-        return "";
-    }
 }
 
 export default function BoardListView({

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Sun, Moon, Laptop, ChevronDown } from "lucide-react";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../hooks";
 import type { Theme } from "../../context/ThemeContext";
 
 export default function ThemeToggle() {

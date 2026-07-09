@@ -5,7 +5,7 @@ import {
   FolderKanban,
   Users,
 } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks";
 import StatCard from "./StatCard";
 
 interface Props {

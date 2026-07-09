@@ -1,4 +1,4 @@
-import { Input } from "../ui/Input";
+import { Input } from "../ui";
 
 interface TaskFilterBarProps {
   search: string;
@@ -23,14 +23,14 @@ export default function TaskFilterBar({
     <>
       {/* View Mode Toggle */}
       <div className="mb-6 flex justify-end">
-        <div className="inline-flex rounded-2xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
+        <div className="inline-flex rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-1 shadow-sm">
           <button
             type="button"
             onClick={() => setViewMode("BOARD")}
             className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
               viewMode === "BOARD"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-900"
+                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
             }`}
           >
             Kanban Board
@@ -40,8 +40,8 @@ export default function TaskFilterBar({
             onClick={() => setViewMode("LIST")}
             className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
               viewMode === "LIST"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-900"
+                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
             }`}
           >
             Task List
@@ -50,8 +50,8 @@ export default function TaskFilterBar({
       </div>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Search tasks
           </label>
           <Input
@@ -61,8 +61,8 @@ export default function TaskFilterBar({
           />
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Filter priority
           </label>
           <select
@@ -70,7 +70,7 @@ export default function TaskFilterBar({
             onChange={(event) =>
               setPriorityFilter(event.target.value as "ALL" | "LOW" | "MEDIUM" | "HIGH")
             }
-            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/60"
+            className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/60"
           >
             <option value="ALL">All priorities</option>
             <option value="LOW">Low</option>
@@ -79,10 +79,10 @@ export default function TaskFilterBar({
           </select>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-sm font-medium text-slate-700">Results</p>
-          <p className="mt-3 text-3xl font-semibold text-slate-900">{resultsCount}</p>
-          <p className="text-sm text-slate-500">Matching tasks</p>
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Results</p>
+          <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{resultsCount}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Matching tasks</p>
         </div>
       </div>
     </>

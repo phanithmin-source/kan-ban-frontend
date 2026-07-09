@@ -2,32 +2,26 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@apollo/client/react";
 import { AlertTriangle, Inbox, Loader2, ListTodo } from "lucide-react";
 
-import StatePanel from "../../components/common/StatePanel";
-import TaskDetailsModal from "../../components/task/TaskDetailsModal";
-import { Badge } from "../../components/ui/Badge";
-import PageHeader from "../../components/ui/PageHeader";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../../components/ui/Table";
-import { Input } from "../../components/ui/Input";
-import ConfirmationDialog from "../../components/ui/ConfirmationDialog";
+import {
+  StatePanel,
+  TaskDetailsModal,
+  Badge,
+  PageHeader,
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  Input,
+  ConfirmationDialog,
+} from "@/components";
 
-import { useAuth } from "../../hooks/useAuth";
-import { useTaskOperations } from "../../hooks/useTaskOperations";
-import { useComments } from "../../hooks/useComments";
+import { useAuth, useTaskOperations, useComments } from "../../hooks";
 
 import { TasksDocument } from "../../gql/graphql";
 import { type Task, type TaskStatus } from "../../types/task";
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return null;
-  const num = Number(value);
-  const date = !Number.isNaN(num) && String(num) === value.trim() ? new Date(num) : new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
+import { formatDate } from "@/lib/formatDate";
 
 export default function MyTasks() {
   const { user } = useAuth();
@@ -50,15 +44,15 @@ export default function MyTasks() {
     variables: {
       page: 1,
       limit: 100, // Fetch up to 100 tasks assigned to user's boards
+      assigneeId: user?.id,
     },
+    skip: !user?.id,
   });
 
   // Filter tasks client-side to only show tasks assigned to the current user
   const myTasks = useMemo(() => {
     if (!data?.tasks?.data || !user) return [];
     return data.tasks.data.filter((task) => {
-      const isAssignedToMe = Number(task.assignee?.id) === Number(user.id);
-
       const matchesSearch =
         task.title.toLowerCase().includes(search.toLowerCase()) ||
         (task.description && task.description.toLowerCase().includes(search.toLowerCase()));
@@ -66,7 +60,7 @@ export default function MyTasks() {
       const matchesStatus = statusFilter === "ALL" || task.status === statusFilter;
       const matchesPriority = priorityFilter === "ALL" || task.priority === priorityFilter;
 
-      return isAssignedToMe && matchesSearch && matchesStatus && matchesPriority;
+      return matchesSearch && matchesStatus && matchesPriority;
     });
   }, [data, user, search, statusFilter, priorityFilter]);
 
@@ -99,7 +93,7 @@ export default function MyTasks() {
 
   const handleUpdate = async (updatedData: Omit<
     Task,
-    "id" | "createdAt" | "assignee" | "isArchived" | "creator" | "comments"
+    "id" | "createdAt" | "updatedAt" | "assignee" | "isArchived" | "creator" | "comments" | "board"
   >) => {
     if (!activeTask) return;
     await updateTask(activeTask.id, updatedData);

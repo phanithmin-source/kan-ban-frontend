@@ -1,13 +1,14 @@
-import DashboardHeader from "../../components/dashboard/DashboardHeader";
-import StatsGrid from "../../components/dashboard/StatsGrid";
-import QuickActions from "../../components/dashboard/QuickActions";
-import RecentTasks from "../../components/dashboard/RecentTasks";
-import DashboardSkeleton from "../../components/dashboard/DashboardSkeleton";
-import StatePanel from "../../components/common/StatePanel";
+import {
+  DashboardHeader,
+  StatsGrid,
+  QuickActions,
+  RecentTasks,
+  DashboardSkeleton,
+  StatePanel,
+} from "@/components";
 import { AlertTriangle } from "lucide-react";
 
-import { useAuth } from "../../hooks/useAuth";
-import { useDashboard } from "../../hooks/useDashboard";
+import { useAuth, useDashboard } from "../../hooks";
 
 
 export default function Dashboard() {

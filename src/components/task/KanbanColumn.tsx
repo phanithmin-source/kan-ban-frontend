@@ -39,13 +39,15 @@ export default function KanbanColumn({
     <section
       ref={setNodeRef}
       className={`rounded-3xl border p-5 shadow-sm transition ${
-        isOver ? "border-primary bg-primary/5" : "border-slate-200 bg-slate-50"
+        isOver
+          ? "border-primary bg-primary/5"
+          : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
       }`}
     >
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             {tasks.length} tasks
           </p>
         </div>
@@ -54,15 +56,15 @@ export default function KanbanColumn({
       <SortableContext items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
         <div className="min-h-[96px] space-y-4">
           {tasks.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-slate-300 px-3 py-6 text-center text-xs text-slate-400">
+            <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 px-3 py-6 text-center text-xs text-slate-400 dark:text-slate-500">
               Drop a task here
             </p>
           ) : (
             tasks.map((task) => {
               const canUserModify = !disabled && (
-                currentUserId === undefined || 
-                isBoardOwner || 
-                Number(task.assignee?.id) === Number(currentUserId)
+                currentUserId === undefined ||
+                isBoardOwner ||
+                (task.assignee?.id && String(task.assignee.id) === String(currentUserId))
               );
               return (
                 <SortableTaskCard

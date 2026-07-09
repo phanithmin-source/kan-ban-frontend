@@ -1,5 +1,6 @@
 import { MessageSquare, Send } from "lucide-react";
-import Button from "../common/Button";
+import { Button } from "../common";
+import { formatDate } from "@/lib/formatDate";
 
 interface CommentUser {
   id: string;
@@ -18,7 +19,7 @@ interface CommentsPanelProps {
   comments: Comment[];
   commentInput: string;
   setCommentInput: (value: string) => void;
-  onPostComment: (e: any) => void | Promise<void>;
+  onPostComment: (e: React.FormEvent) => void | Promise<void>;
   editingCommentId: string | null;
   setEditingCommentId: (value: string | null) => void;
   editingCommentText: string;
@@ -30,17 +31,7 @@ interface CommentsPanelProps {
   userGlobalRole?: string;
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return null;
-  const num = Number(value);
-  const date = !Number.isNaN(num) && String(num) === value.trim() ? new Date(num) : new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
+
 
 function initials(name: string | null | undefined) {
   if (!name) return "?";
@@ -68,9 +59,9 @@ export default function CommentsPanel({
   userGlobalRole,
 }: CommentsPanelProps) {
   return (
-    <div className="border-t border-slate-200 pt-6">
-      <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
-        <MessageSquare className="h-5 w-5 text-slate-500" />
+    <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-4">
+        <MessageSquare className="h-5 w-5 text-slate-500 dark:text-slate-400" />
         Discussion ({comments?.length ?? 0})
       </h3>
 
@@ -80,7 +71,7 @@ export default function CommentsPanel({
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
           placeholder="Ask a question or post an update..."
-          className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/60"
+          className="flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/60"
         />
         <Button type="submit" className="rounded-2xl px-4 py-2">
           <Send className="h-4 w-4" />
@@ -91,28 +82,28 @@ export default function CommentsPanel({
       <div className="mt-6 space-y-4 max-h-[300px] overflow-y-auto pr-1">
         {comments && comments.length > 0 ? (
           comments.map((c) => (
-            <div key={c.id} className="p-3 rounded-2xl border border-slate-100 bg-slate-50">
+            <div key={c.id} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-[10px] font-semibold text-primary">
                     {initials(c.user.name)}
                   </span>
-                  <span className="text-xs font-semibold text-slate-900">{c.user.name}</span>
-                  <span className="text-[10px] text-slate-400">{formatDate(c.createdAt)}</span>
+                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">{c.user.name}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDate(c.createdAt)}</span>
                 </div>
 
                 {/* Comment Edit/Delete Actions */}
-                {(Number(c.user.id) === Number(currentUserId) ||
+                {(String(c.user.id) === String(currentUserId) ||
                   userGlobalRole === "ADMIN" ||
                   userBoardRole === "OWNER") && (
                   <div className="flex items-center gap-1.5">
-                    {editingCommentId !== c.id && Number(c.user.id) === Number(currentUserId) && (
+                    {editingCommentId !== c.id && String(c.user.id) === String(currentUserId) && (
                       <button
                         onClick={() => {
                           setEditingCommentId(c.id);
                           setEditingCommentText(c.content);
                         }}
-                        className="text-[10px] font-semibold text-slate-500 hover:text-primary transition"
+                        className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-primary transition"
                       >
                         Edit
                       </button>
@@ -132,7 +123,7 @@ export default function CommentsPanel({
                   <input
                     value={editingCommentText}
                     onChange={(e) => setEditingCommentText(e.target.value)}
-                    className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary/60"
+                    className="flex-1 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary/60"
                   />
                   <Button
                     onClick={() => onSaveEditComment(c.id)}
@@ -149,14 +140,14 @@ export default function CommentsPanel({
                   </Button>
                 </div>
               ) : (
-                <p className="mt-1.5 text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">
+                <p className="mt-1.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
                   {c.content}
                 </p>
               )}
             </div>
           ))
         ) : (
-          <p className="text-xs text-slate-500 italic">
+          <p className="text-xs text-slate-500 dark:text-slate-400 italic">
             No comments yet. Start the conversation!
           </p>
         )}

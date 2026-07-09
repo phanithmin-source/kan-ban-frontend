@@ -4,9 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client/react";
 import { Pencil, X, Check } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
-import Button from "../../components/common/Button";
-import { UpdateUserDocument } from "../../gql/graphql";
+import { useAuth } from "../../hooks";
+import { Button } from "@/components";
+import { UpdateUserDocument, UserFieldsFragmentDoc } from "../../gql/graphql";
+import { useFragment } from "../../gql/fragment-masking";
+import { toast } from "sonner";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -16,7 +18,7 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, updateUser: updateUserContext } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -48,12 +50,19 @@ export default function Profile() {
     if (!user) return;
     setServerError(null);
     try {
-      await updateUser({
+      const { data: resData } = await updateUser({
         variables: { id: user.id, input: data },
       });
+      if (resData?.updateUser) {
+        const unmasked = useFragment(UserFieldsFragmentDoc, resData.updateUser);
+        updateUserContext(unmasked);
+      }
+      toast.success("Profile updated successfully");
       setIsEditing(false);
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Update failed");
+      const msg = err instanceof Error ? err.message : "Update failed";
+      setServerError(msg);
+      toast.error(msg);
     }
   };
 

@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
-import Button from "../../components/common/Button";
-import { Input } from "../../components/ui/Input";
-import { useAuth } from "../../hooks/useAuth";
+import { Button, Input } from "@/components";
+import { useAuth } from "../../hooks";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -39,9 +39,12 @@ export default function Register() {
 
     try {
       await signUp(data.name, data.email, data.password);
+      toast.success("Account created successfully!");
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      const msg = err instanceof Error ? err.message : "Registration failed";
+      setError(msg);
+      toast.error(msg);
     }
   };
 

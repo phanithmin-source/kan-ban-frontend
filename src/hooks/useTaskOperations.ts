@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { toast } from "sonner";
 import {
   CreateTaskDocument,
   UpdateTaskDocument,
@@ -6,13 +7,15 @@ import {
   ArchiveTaskDocument,
   AssignTaskDocument,
   UpdateTaskStatusDocument,
+  type AssignTaskMutation,
+  type UpdateTaskStatusMutation,
 } from "../gql/graphql";
 import type { Task, TaskStatus } from "../types/task";
 
 interface UseTaskOperationsProps {
   boardId?: string;
   onSuccess?: () => void;
-  onAssignSuccess?: (assignee: any) => void;
+  onAssignSuccess?: (assignee: Task["assignee"]) => void;
 }
 
 export function useTaskOperations({
@@ -24,48 +27,72 @@ export function useTaskOperations({
     CreateTaskDocument,
     {
       onCompleted: () => {
+        toast.success("Task created successfully");
         onSuccess?.();
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to create task");
       },
     }
   );
 
   const [updateTaskMutation] = useMutation(UpdateTaskDocument, {
     onCompleted: () => {
+      toast.success("Task updated successfully");
       onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to update task");
     },
   });
 
   const [deleteTaskMutation] = useMutation(DeleteTaskDocument, {
     onCompleted: () => {
+      toast.success("Task deleted successfully");
       onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to delete task");
     },
   });
 
   const [archiveTaskMutation] = useMutation(ArchiveTaskDocument, {
     onCompleted: () => {
+      toast.success("Task archived successfully");
       onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to archive task");
     },
   });
 
   const [assignTaskMutation] = useMutation(AssignTaskDocument, {
     onCompleted: (data) => {
+      toast.success("Task assignee updated");
       if (data?.assignTask?.assignee) {
         onAssignSuccess?.(data.assignTask.assignee);
       }
       onSuccess?.();
     },
+    onError: (err) => {
+      toast.error(err.message || "Failed to assign task");
+    },
   });
 
   const [updateTaskStatusMutation] = useMutation(UpdateTaskStatusDocument, {
     onCompleted: () => {
+      toast.success("Task status updated");
       onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to update task status");
     },
   });
 
   const createTask = async (
     newTask: Omit<
       Task,
-      "id" | "createdAt" | "assignee" | "isArchived" | "creator" | "comments"
+      "id" | "createdAt" | "updatedAt" | "assignee" | "isArchived" | "creator" | "comments" | "board"
     >
   ) => {
     if (!boardId) return;
@@ -78,7 +105,7 @@ export function useTaskOperations({
     id: string,
     updatedData: Omit<
       Task,
-      "id" | "createdAt" | "assignee" | "isArchived" | "creator" | "comments"
+      "id" | "createdAt" | "updatedAt" | "assignee" | "isArchived" | "creator" | "comments" | "board"
     >
   ) => {
     return updateTaskMutation({
@@ -98,7 +125,7 @@ export function useTaskOperations({
     });
   };
 
-  const assignTask = async (taskId: string, userId: string, selectedMemberUser: any) => {
+  const assignTask = async (taskId: string, userId: string, selectedMemberUser: Task["assignee"]) => {
     return assignTaskMutation({
       variables: { taskId, userId },
       optimisticResponse: {
@@ -115,7 +142,7 @@ export function useTaskOperations({
               }
             : null,
         },
-      } as any,
+      } as AssignTaskMutation,
     });
   };
 
@@ -131,7 +158,7 @@ export function useTaskOperations({
           status,
           updatedAt: new Date().toISOString(),
         },
-      } as any,
+      } as UpdateTaskStatusMutation,
     });
   };
 

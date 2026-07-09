@@ -4,14 +4,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AlertTriangle, Loader2, Search, Edit2, Trash2 } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
-import Button from "../../components/common/Button";
-import StatePanel from "../../components/common/StatePanel";
-import PageHeader from "../../components/ui/PageHeader";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../../components/ui/Table";
-import { Input } from "../../components/ui/Input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog";
-import ConfirmationDialog from "../../components/ui/ConfirmationDialog";
+import { useAuth } from "../../hooks";
+import {
+  Button,
+  StatePanel,
+  PageHeader,
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  Input,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  ConfirmationDialog,
+} from "@/components";
+import { toast } from "sonner";
 import {
   GetUsersDocument,
   UpdateUserDocument,
@@ -43,14 +54,22 @@ export default function Users() {
 
   const [updateUser, { loading: updating }] = useMutation(UpdateUserDocument, {
     onCompleted: () => {
+      toast.success("User updated successfully");
       setEditingUser(null);
       void refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to update user");
     },
   });
 
   const [deleteUser] = useMutation(DeleteUserDocument, {
     onCompleted: () => {
+      toast.success("User deleted successfully");
       void refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to delete user");
     },
   });
 
@@ -84,8 +103,8 @@ export default function Users() {
   };
 
   const handleDeleteClick = (id: string) => {
-    if (Number(id) === Number(currentUser?.id)) {
-      alert("You cannot delete your own admin account.");
+    if (String(id) === String(currentUser?.id)) {
+      toast.warning("You cannot delete your own admin account.");
       return;
     }
     setUserToDelete(id);
@@ -207,7 +226,7 @@ export default function Users() {
                     <button
                       type="button"
                       onClick={() => handleDeleteClick(member.id)}
-                      disabled={Number(member.id) === Number(currentUser?.id)}
+                      disabled={String(member.id) === String(currentUser?.id)}
                       className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-danger transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400"
                       aria-label="Delete User"
                     >

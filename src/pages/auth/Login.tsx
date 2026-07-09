@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
-import Button from "../../components/common/Button";
-import { Input } from "../../components/ui/Input";
-import { useAuth } from "../../hooks/useAuth";
+import { Button, Input } from "@/components";
+import { useAuth } from "../../hooks";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -37,9 +37,12 @@ export default function Login() {
 
     try {
       await signIn(data.email, data.password);
+      toast.success("Welcome back!");
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const msg = err instanceof Error ? err.message : "Login failed";
+      setError(msg);
+      toast.error(msg);
     }
   };
 

@@ -9,7 +9,6 @@ export function useBoard(boardId: string) {
 
   return {
     board: data?.board ?? null,
-    tasks: data?.board?.tasks ?? [],
     loading,
     error,
     refetch, 

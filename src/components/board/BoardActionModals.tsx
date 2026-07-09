@@ -1,21 +1,11 @@
 import type { RefObject } from "react";
-import Button from "../common/Button";
-import { Input } from "../ui/Input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/Dialog";
+import { Button } from "../common";
+import { Input, Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui";
+import { type BoardModalType } from "../../hooks/useBoardPageState";
 
 interface BoardActionModalsProps {
-  boardModal:
-    | { type: "create" }
-    | { type: "rename"; currentName: string }
-    | { type: "delete" }
-    | { type: "archive" }
-    | null;
-  setBoardModal: (value: any | null) => void;
+  boardModal: BoardModalType;
+  setBoardModal: (value: BoardModalType) => void;
   boardName?: string;
   boardModalInputRef: RefObject<HTMLInputElement | null>;
   boardModalInput: string;
@@ -51,9 +41,9 @@ export default function BoardActionModals({
 
         {boardModal.type === "delete" ? (
           <>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Are you sure you want to delete{" "}
-              <span className="font-semibold text-slate-900">{boardName}</span>? All
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{boardName}</span>? All
               tasks on this board will be permanently removed.
             </p>
             <div className="flex gap-3 mt-4">
@@ -76,9 +66,9 @@ export default function BoardActionModals({
           </>
         ) : boardModal.type === "archive" ? (
           <>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Are you sure you want to archive{" "}
-              <span className="font-semibold text-slate-900">{boardName}</span>? It
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{boardName}</span>? It
               will be removed from your active workspace.
             </p>
             <div className="flex gap-3 mt-4">
@@ -104,13 +94,13 @@ export default function BoardActionModals({
             <div className="mt-2">
               <label
                 htmlFor="board-modal-name"
-                className="mb-1.5 block text-sm font-medium text-slate-700"
+                className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 Board name
               </label>
               <Input
                 id="board-modal-name"
-                ref={boardModalInputRef as any}
+                ref={boardModalInputRef}
                 type="text"
                 value={boardModalInput}
                 onChange={(e) => setBoardModalInput(e.target.value)}

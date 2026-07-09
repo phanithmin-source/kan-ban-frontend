@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { toast } from "sonner";
 import {
   AddCommentDocument,
   UpdateCommentDocument,
@@ -11,15 +12,33 @@ interface UseCommentsProps {
 
 export function useComments({ onSuccess }: UseCommentsProps = {}) {
   const [addCommentMutation] = useMutation(AddCommentDocument, {
-    onCompleted: () => onSuccess?.(),
+    onCompleted: () => {
+      toast.success("Comment added");
+      onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to add comment");
+    },
   });
 
   const [updateCommentMutation] = useMutation(UpdateCommentDocument, {
-    onCompleted: () => onSuccess?.(),
+    onCompleted: () => {
+      toast.success("Comment updated");
+      onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to update comment");
+    },
   });
 
   const [deleteCommentMutation] = useMutation(DeleteCommentDocument, {
-    onCompleted: () => onSuccess?.(),
+    onCompleted: () => {
+      toast.success("Comment deleted");
+      onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to delete comment");
+    },
   });
 
   const addComment = async (taskId: string, content: string) => {

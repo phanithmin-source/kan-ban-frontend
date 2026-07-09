@@ -120,6 +120,10 @@ export function AuthProvider({ children }: Props) {
     client.clearStore();
   }, [client, logoutMutation]);
 
+  const updateUser = useCallback((updatedUser: Partial<AuthUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...updatedUser } : null));
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -128,8 +132,9 @@ export function AuthProvider({ children }: Props) {
       signIn,
       signUp,
       logout,
+      updateUser,
     }),
-    [user, loading, signIn, signUp, logout]
+    [user, loading, signIn, signUp, logout, updateUser]
   );
 
   return (

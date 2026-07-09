@@ -1,12 +1,6 @@
 import { Trash } from "lucide-react";
-import Button from "../common/Button";
-import { Avatar, AvatarFallback } from "../ui/Avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/Dialog";
+import { Button } from "../common";
+import { Avatar, AvatarFallback, Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui";
 import type { BoardQuery, GetUsersQuery } from "../../gql/graphql";
 
 type BoardType = NonNullable<BoardQuery["board"]>;
@@ -53,6 +47,8 @@ export default function BoardMembersModal({
 }: BoardMembersModalProps) {
   const boardMembers = board.members ?? [];
 
+  const selectClass = "rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary/60 cursor-pointer";
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="max-w-lg">
@@ -62,17 +58,17 @@ export default function BoardMembersModal({
 
         {/* Invite Form (only for board Owner/Admins) */}
         {canManageBoard && (
-          <div className="border-b border-slate-100 pb-4">
-            <h3 className="text-sm font-semibold text-slate-700 mb-2">Add New Member</h3>
+          <div className="border-b border-slate-100 dark:border-slate-700 pb-4">
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Add New Member</h3>
             <div className="flex flex-wrap gap-2">
               <select
                 value={inviteUserId}
                 onChange={(e) => setInviteUserId(e.target.value)}
-                className="flex-1 min-w-[200px] rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
+                className="flex-1 min-w-[200px] rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
               >
                 <option value="">Select a user</option>
                 {users
-                  ?.filter((u) => !boardMembers.some((m) => Number(m.user.id) === Number(u.id)))
+                  ?.filter((u) => !boardMembers.some((m) => String(m.user.id) === String(u.id)))
                   ?.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.name} ({u.email})
@@ -81,8 +77,8 @@ export default function BoardMembersModal({
               </select>
               <select
                 value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value as any)}
-                className="w-32 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
+                onChange={(e) => setInviteRole(e.target.value as "MEMBER" | "VIEWER")}
+                className="w-32 rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
               >
                 <option value="MEMBER">Member</option>
                 <option value="VIEWER">Viewer</option>
@@ -103,7 +99,7 @@ export default function BoardMembersModal({
           {boardMembers.map((m) => (
             <div
               key={m.id}
-              className="flex items-center justify-between gap-4 p-2 rounded-2xl hover:bg-slate-50 transition-colors"
+              className="flex items-center justify-between gap-4 p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
@@ -112,8 +108,8 @@ export default function BoardMembersModal({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{m.user.name}</p>
-                  <p className="text-xs text-slate-500">{m.user.email}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{m.user.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{m.user.email}</p>
                 </div>
               </div>
 
@@ -123,8 +119,8 @@ export default function BoardMembersModal({
                   <>
                     <select
                       value={m.role}
-                      onChange={(e) => onUpdateRole(m.user.id, e.target.value as any)}
-                      className="rounded-xl border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary/60 cursor-pointer"
+                      onChange={(e) => onUpdateRole(m.user.id, e.target.value as "MEMBER" | "VIEWER")}
+                      className={selectClass}
                     >
                       <option value="MEMBER">Member</option>
                       <option value="VIEWER">Viewer</option>
@@ -138,7 +134,7 @@ export default function BoardMembersModal({
                     </button>
                   </>
                 ) : (
-                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {m.role}
                   </span>
                 )}

@@ -19,7 +19,7 @@ export function useBoardPermissions(
     }
 
     const currentMember = board.members?.find(
-      (m) => Number(m.user.id) === Number(user.id)
+      (m) => String(m.user.id) === String(user.id)
     );
     const userBoardRole = currentMember?.role;
 
@@ -31,7 +31,7 @@ export function useBoardPermissions(
     const canManageBoard =
       user.role === "ADMIN" ||
       userBoardRole === "OWNER" ||
-      !!(board.owner?.id && Number(board.owner.id) === Number(user.id));
+      !!(board.owner?.id && String(board.owner.id) === String(user.id));
 
     const isBoardOwner = user.role === "ADMIN" || userBoardRole === "OWNER";
 

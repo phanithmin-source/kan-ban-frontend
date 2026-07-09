@@ -24,6 +24,8 @@ export interface AuthContextType {
   ): Promise<void>;
 
   logout(): void;
+
+  updateUser(updatedUser: Partial<AuthUser>): void;
 }
 
 export const AuthContext =

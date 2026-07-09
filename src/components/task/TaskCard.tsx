@@ -2,20 +2,7 @@ import type { CSSProperties } from "react";
 import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 import { Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 import { type Task } from "../../types/task";
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return null;
-
-  const num = Number(value);
-  const date = !Number.isNaN(num) && String(num) === value.trim() ? new Date(num) : new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
+import { formatDate } from "@/lib/formatDate";
 
 function isOverdue(dueDate: string | null | undefined, status: Task["status"]) {
   if (!dueDate || status === "DONE") return false;
@@ -86,13 +73,13 @@ function TaskCard({
           onView?.(task);
         }
       }}
-      className={`cursor-pointer rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md hover:border-slate-300 ${
+      className={`cursor-pointer rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm transition hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 ${
         dragging ? "opacity-70" : ""
       }`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-slate-900">{task.title}</p>
+          <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{task.title}</p>
           <span
             className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${PRIORITY_CLASSES[task.priority]}`}
           >
@@ -107,20 +94,20 @@ function TaskCard({
       </div>
 
       {task.description ? (
-        <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">{task.description}</p>
+        <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600 dark:text-slate-400">{task.description}</p>
       ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-        <span className={overdue ? "font-semibold text-danger" : "text-slate-500"}>
+        <span className={overdue ? "font-semibold text-danger" : "text-slate-500 dark:text-slate-400"}>
           Due {formatDate(task.dueDate) || "N/A"}
         </span>
-        <span className="text-slate-400">•</span>
-        <span className="text-slate-500">Created {formatDate(task.createdAt)}</span>
+        <span className="text-slate-400 dark:text-slate-600">•</span>
+        <span className="text-slate-500 dark:text-slate-400">Created {formatDate(task.createdAt)}</span>
       </div>
 
       {(onEdit || onMoveLeft || onMoveRight) && (
         <div
-          className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3"
+          className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-3"
           // stop clicks on the footer controls from also triggering onView
           onClick={(event) => event.stopPropagation()}
           onPointerDown={(event) => event.stopPropagation()}
@@ -131,7 +118,7 @@ function TaskCard({
               disabled={!canMoveLeft}
               onClick={() => onMoveLeft?.(task)}
               aria-label="Move to previous column"
-              className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+              className="rounded-lg p-1 text-slate-400 dark:text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -140,7 +127,7 @@ function TaskCard({
               disabled={!canMoveRight}
               onClick={() => onMoveRight?.(task)}
               aria-label="Move to next column"
-              className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+              className="rounded-lg p-1 text-slate-400 dark:text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -151,7 +138,7 @@ function TaskCard({
               type="button"
               onClick={() => onEdit(task)}
               aria-label="Edit task"
-              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-slate-500 transition hover:bg-primary/10 hover:text-primary"
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-slate-500 dark:text-slate-400 transition hover:bg-primary/10 hover:text-primary"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit

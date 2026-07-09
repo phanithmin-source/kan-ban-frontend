@@ -1,4 +1,4 @@
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks";
 import TaskRow from "./TaskRow";
 import EmptyState from "./EmptyState";
 import type { DashboardTasksQuery } from "../../gql/graphql";

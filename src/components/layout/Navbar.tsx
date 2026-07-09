@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Columns, LogIn, LogOut, Menu , User, X , Users , LayoutDashboard, ListTodo } from "lucide-react";
 import clsx from "clsx";
-import Button from "../common/Button";
-import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../common";
+import { useAuth } from "../../hooks";
 import logoUrl from "../../assets/kanban-logo.svg";
 import ThemeToggle from "./ThemeToggle";
 
@@ -126,9 +126,13 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-6 md:flex">
-          {links.map((link) => (
-            <NavItem key={link.to} link={link} active={location.pathname === link.to} />
-          ))}
+          {links.map((link) => {
+            const isActive =
+              link.to === "/"
+                ? location.pathname === "/"
+                : location.pathname.startsWith(link.to);
+            return <NavItem key={link.to} link={link} active={isActive} />;
+          })}
         </div>
 
         <div className="hidden items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-4 md:flex">
@@ -166,14 +170,20 @@ export default function Navbar() {
       {menuOpen ? (
         <div className="mt-3 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 shadow-sm md:hidden">
           <div className="flex flex-col gap-3">
-            {links.map((link) => (
-              <NavItem
-                key={link.to}
-                link={link}
-                active={location.pathname === link.to}
-                onClick={() => setMenuOpen(false)}
-              />
-            ))}
+            {links.map((link) => {
+              const isActive =
+                link.to === "/"
+                  ? location.pathname === "/"
+                  : location.pathname.startsWith(link.to);
+              return (
+                <NavItem
+                  key={link.to}
+                  link={link}
+                  active={isActive}
+                  onClick={() => setMenuOpen(false)}
+                />
+              );
+            })}
 
             <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Theme</span>

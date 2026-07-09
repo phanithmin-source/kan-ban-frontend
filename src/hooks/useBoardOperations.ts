@@ -1,5 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   CreateBoardDocument,
   UpdateBoardDocument,
@@ -18,37 +19,67 @@ export function useBoardOperations(boardId?: string) {
   const [createBoardMutation] = useMutation(CreateBoardDocument, {
     onCompleted: (data) => {
       if (data?.createBoard) {
+        toast.success("Board created successfully");
         navigate(`/board/${data.createBoard.id}`);
       }
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to create board");
     },
     refetchQueries: [{ query: BoardsDocument }],
   });
 
   const [updateBoardMutation] = useMutation(UpdateBoardDocument, {
+    onCompleted: () => {
+      toast.success("Board renamed successfully");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to rename board");
+    },
     refetchQueries: [{ query: BoardsDocument }],
   });
 
   const [deleteBoardMutation] = useMutation(DeleteBoardDocument, {
     onCompleted: () => {
+      toast.success("Board deleted successfully");
       navigate("/board");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to delete board");
     },
     refetchQueries: [{ query: BoardsDocument }],
   });
 
   const [archiveBoardMutation] = useMutation(ArchiveBoardDocument, {
     onCompleted: () => {
+      toast.success("Board archived successfully");
       navigate("/board");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to archive board");
     },
     refetchQueries: [{ query: BoardsDocument }],
   });
 
   const [addBoardMemberMutation] = useMutation(AddBoardMemberDocument, {
+    onCompleted: () => {
+      toast.success("Member added successfully");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to add member");
+    },
     refetchQueries: boardId
       ? [{ query: BoardDocument, variables: { id: boardId } }]
       : [],
   });
 
   const [removeBoardMemberMutation] = useMutation(RemoveBoardMemberDocument, {
+    onCompleted: () => {
+      toast.success("Member removed successfully");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to remove member");
+    },
     refetchQueries: boardId
       ? [{ query: BoardDocument, variables: { id: boardId } }]
       : [],
@@ -57,6 +88,12 @@ export function useBoardOperations(boardId?: string) {
   const [updateBoardMemberRoleMutation] = useMutation(
     UpdateBoardMemberRoleDocument,
     {
+      onCompleted: () => {
+        toast.success("Member role updated successfully");
+      },
+      onError: (err) => {
+        toast.error(err.message || "Failed to update member role");
+      },
       refetchQueries: boardId
         ? [{ query: BoardDocument, variables: { id: boardId } }]
         : [],

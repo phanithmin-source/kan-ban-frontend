@@ -1,7 +1,7 @@
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { Loader2, AlertTriangle, Inbox } from "lucide-react";
-import StatePanel from "../common/StatePanel";
-import KanbanColumn from "../task/KanbanColumn";
+import { StatePanel } from "../common";
+import { KanbanColumn } from "../task";
 import { type Task, type TaskStatus } from "../../types/task";
 
 export interface BoardKanbanViewProps {

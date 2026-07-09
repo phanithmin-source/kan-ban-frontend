@@ -5,7 +5,7 @@ import {
   ListTodo,
   User,
 } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks";
 
 interface QuickAction {
   label: string;
@@ -51,7 +51,7 @@ export default function QuickActions() {
   ];
 
   const visibleActions = actions.filter(
-    (action) => !action.roles || action.roles.includes(user?.role as any)
+    (action) => !action.roles || (user?.role && action.roles.includes(user.role))
   );
 
   if (visibleActions.length === 0) return null;

@@ -1,14 +1,11 @@
-import Button from "../common/Button";
+import { Button } from "../common";
 import TaskForm from "./TaskForm";
 import CommentsPanel from "./CommentsPanel";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/Dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui";
 import type { Task, TaskStatus } from "../../types/task";
 import type { BoardQuery } from "../../gql/graphql";
+import { formatDate } from "@/lib/formatDate";
+import { STATUS_ORDER } from "@/lib/taskConstants";
 
 type BoardMembersType = NonNullable<BoardQuery["board"]>["members"];
 
@@ -23,16 +20,16 @@ interface TaskDetailsModalProps {
   userGlobalRole?: string;
   currentUserId?: string;
   boardMembers: BoardMembersType;
-  onAssignTask: (taskId: string, userId: string, selectedMemberUser: any) => void | Promise<any>;
-  onChangeTaskStatus: (task: Task, status: TaskStatus) => void | Promise<any>;
-  onUpdateTask: (updatedData: any) => void | Promise<void>;
+  onAssignTask: (taskId: string, userId: string, selectedMemberUser: Task["assignee"]) => void | Promise<unknown>;
+  onChangeTaskStatus: (task: Task, status: TaskStatus) => void | Promise<unknown>;
+  onUpdateTask: (updatedData: Omit<Task, "id" | "createdAt" | "updatedAt" | "assignee" | "isArchived" | "creator" | "comments" | "board">) => void | Promise<void>;
   onArchiveTask: (taskId: string) => void | Promise<void>;
   onDeleteTask: (taskId: string) => void | Promise<void>;
   
   // comments panel forwarding props
   commentInput: string;
   setCommentInput: (value: string) => void;
-  onPostComment: (e: any) => void | Promise<void>;
+  onPostComment: (e: React.FormEvent) => void | Promise<void>;
   editingCommentId: string | null;
   setEditingCommentId: (value: string | null) => void;
   editingCommentText: string;
@@ -41,19 +38,10 @@ interface TaskDetailsModalProps {
   onDeleteComment: (commentId: string) => void | Promise<void>;
 }
 
-const STATUS_ORDER: TaskStatus[] = ["TODO", "IN_PROGRESS", "REVIEW", "DONE"];
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return null;
-  const num = Number(value);
-  const date = !Number.isNaN(num) && String(num) === value.trim() ? new Date(num) : new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
+const infoCardClass = "rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4";
+const labelClass = "text-sm uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400";
+const valueClass = "mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100";
+const valueSmClass = "mt-2 text-sm text-slate-700 dark:text-slate-300";
 
 export default function TaskDetailsModal({
   activeTask,
@@ -102,11 +90,9 @@ export default function TaskDetailsModal({
         ) : (
           <div className="space-y-6 mt-2">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Status
-                </p>
-                <p className="mt-2 text-lg font-semibold text-slate-900">
+              <div className={infoCardClass}>
+                <p className={labelClass}>Status</p>
+                <p className={valueClass}>
                   {activeTask.status.replaceAll("_", " ")}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -116,7 +102,7 @@ export default function TaskDetailsModal({
                       (userGlobalRole === "ADMIN" ||
                         userGlobalRole === "MANAGER" ||
                         userBoardRole === "OWNER" ||
-                        Number(activeTask.assignee?.id) === Number(currentUserId));
+                        activeTask.assignee?.id && String(activeTask.assignee.id) === String(currentUserId));
                     return (
                       <button
                         key={s}
@@ -129,7 +115,7 @@ export default function TaskDetailsModal({
                         className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
                           activeTask.status === s
                             ? "bg-primary text-white cursor-default"
-                            : "border border-slate-200 bg-white text-slate-600 hover:border-primary/40 hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                            : "border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary/40 hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                         }`}
                       >
                         {s.replaceAll("_", " ")}
@@ -138,54 +124,42 @@ export default function TaskDetailsModal({
                   })}
                 </div>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Priority
-                </p>
-                <p className="mt-2 text-lg font-semibold text-slate-900">
+              <div className={infoCardClass}>
+                <p className={labelClass}>Priority</p>
+                <p className={valueClass}>
                   {activeTask.priority}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                Description
-              </p>
-              <p className="mt-2 text-sm leading-6 text-slate-700">
+            <div className={infoCardClass}>
+              <p className={labelClass}>Description</p>
+              <p className={valueSmClass}>
                 {activeTask.description || "No description added."}
               </p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Due date
-                </p>
-                <p className="mt-2 text-sm text-slate-700">
+              <div className={infoCardClass}>
+                <p className={labelClass}>Due date</p>
+                <p className={valueSmClass}>
                   {formatDate(activeTask.dueDate) || "No due date"}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Created
-                </p>
-                <p className="mt-2 text-sm text-slate-700">
+              <div className={infoCardClass}>
+                <p className={labelClass}>Created</p>
+                <p className={valueSmClass}>
                   {formatDate(activeTask.createdAt)}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Creator
-                </p>
-                <p className="mt-2 text-sm text-slate-700">
+              <div className={infoCardClass}>
+                <p className={labelClass}>Creator</p>
+                <p className={valueSmClass}>
                   {activeTask.creator?.name || "System"}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Assignee
-                </p>
+              <div className={infoCardClass}>
+                <p className={labelClass}>Assignee</p>
                 {canEditTasks ? (
                   <select
                     value={activeTask.assignee?.id ?? ""}
@@ -200,7 +174,7 @@ export default function TaskDetailsModal({
                         );
                       }
                     }}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary/60 cursor-pointer"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary/60 cursor-pointer"
                   >
                     <option value="">Unassigned</option>
                     {boardMembers?.map((m) => (
@@ -210,7 +184,7 @@ export default function TaskDetailsModal({
                     ))}
                   </select>
                 ) : (
-                  <p className="mt-2 text-sm text-slate-700">
+                  <p className={valueSmClass}>
                     {activeTask.assignee?.name || "Unassigned"}
                   </p>
                 )}
@@ -232,7 +206,7 @@ export default function TaskDetailsModal({
                 <button
                   type="button"
                   onClick={() => onArchiveTask(activeTask.id)}
-                  className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-600 transition hover:border-amber-400 cursor-pointer"
+                  className="rounded-2xl border border-amber-200 dark:border-amber-700/50 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm font-semibold text-amber-600 dark:text-amber-400 transition hover:border-amber-400 dark:hover:border-amber-600 cursor-pointer"
                 >
                   Archive task
                 </button>
@@ -250,7 +224,7 @@ export default function TaskDetailsModal({
 
             {/* Comments discussions panel */}
             <CommentsPanel
-              comments={(activeTask as any).comments ?? []}
+              comments={activeTask.comments ?? []}
               commentInput={commentInput}
               setCommentInput={setCommentInput}
               onPostComment={onPostComment}

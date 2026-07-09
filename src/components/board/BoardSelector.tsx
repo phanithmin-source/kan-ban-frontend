@@ -1,5 +1,5 @@
 import { Users } from "lucide-react";
-import Button from "../common/Button";
+import { Button } from "../common";
 import type { BoardsQuery } from "../../gql/graphql";
 
 type BoardListType = BoardsQuery["boards"];
@@ -32,10 +32,10 @@ export default function BoardSelector({
   canCreateBoard,
 }: BoardSelectorProps) {
   return (
-    <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
+    <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700 pb-5">
       <div className="flex flex-wrap items-center gap-3">
         <label
-          className="text-sm font-semibold text-slate-500 uppercase tracking-wider"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
           htmlFor="board-select"
         >
           Board:
@@ -44,14 +44,14 @@ export default function BoardSelector({
           id="board-select"
           value={boardId}
           onChange={(e) => onSelectBoard(e.target.value)}
-          className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
+          className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
         >
           <option value="" disabled>
             Select a board
           </option>
           {boards
-            .filter((b: any) => !b.isArchived)
-            .map((b: any) => (
+            .filter((b: BoardListType[number]) => !b.isArchived)
+            .map((b: BoardListType[number]) => (
               <option key={b.id} value={b.id}>
                 {b.name}
               </option>
@@ -100,8 +100,8 @@ export default function BoardSelector({
       </div>
 
       {boardOwnerName && (
-        <p className="text-xs text-slate-500 font-medium">
-          Owner: <span className="font-semibold text-slate-700">{boardOwnerName}</span>
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          Owner: <span className="font-semibold text-slate-700 dark:text-slate-300">{boardOwnerName}</span>
         </p>
       )}
     </div>
