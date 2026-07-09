@@ -19,6 +19,7 @@ import {
 import { useMyTasksPage } from "../../hooks";
 import { type TaskStatus } from "../../types/task";
 import { formatDate } from "@/lib/formatDate";
+import { getStatusBadgeVariant, getPriorityBadgeVariant } from "@/lib/taskConstants";
 
 export default function MyTasks() {
   const {
@@ -54,8 +55,6 @@ export default function MyTasks() {
     handleConfirmArchive,
     handleDeleteCommentClick,
     handleConfirmDeleteComment,
-    getStatusBadgeVariant,
-    getPriorityBadgeVariant,
     handlePostComment,
     handleSaveEditComment,
   } = useMyTasksPage();

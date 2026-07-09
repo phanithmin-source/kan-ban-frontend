@@ -2,6 +2,7 @@ import { MessageSquare, Send } from "lucide-react";
 import { Button } from "../common";
 import { Input } from "../ui";
 import { formatDate } from "@/lib/formatDate";
+import { getInitials } from "@/lib/utils";
 
 interface CommentUser {
   id: string;
@@ -34,15 +35,6 @@ interface CommentsPanelProps {
 
 
 
-function initials(name: string | null | undefined) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .substring(0, 2)
-    .toUpperCase();
-}
 
 export default function CommentsPanel({
   comments,
@@ -86,7 +78,7 @@ export default function CommentsPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-[10px] font-semibold text-primary">
-                    {initials(c.user.name)}
+                    {getInitials(c.user.name)}
                   </span>
                   <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">{c.user.name}</span>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDate(c.createdAt)}</span>

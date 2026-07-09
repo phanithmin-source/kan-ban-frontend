@@ -37,7 +37,7 @@ export function useMyTasksPage() {
 
     // Directly use the server-filtered tasks list
     const myTasks = useMemo(() => {
-        return (data?.tasks?.data ?? []) as unknown as Task[];
+        return (data?.tasks?.data ?? []) as Task[];
     }, [data]);
 
     const {
@@ -62,7 +62,7 @@ export function useMyTasksPage() {
             const res = await refetch();
             const updatedTask = res.data?.tasks?.data?.find((t) => t.id === activeTask?.id);
             if (updatedTask) {
-                setActiveTask(updatedTask as unknown as Task);
+                setActiveTask(updatedTask as Task);
             }
         },
     });
@@ -101,29 +101,6 @@ export function useMyTasksPage() {
         setCommentToDelete(null);
     };
 
-    const getStatusBadgeVariant = (status: TaskStatus) => {
-        switch (status) {
-            case "DONE":
-                return "success";
-            case "REVIEW":
-                return "warning";
-            case "IN_PROGRESS":
-                return "info";
-            default:
-                return "secondary";
-        }
-    };
-
-    const getPriorityBadgeVariant = (priority: string) => {
-        switch (priority) {
-            case "HIGH":
-                return "destructive";
-            case "MEDIUM":
-                return "warning";
-            default:
-                return "success";
-        }
-    };
 
     const handlePostComment = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -171,8 +148,6 @@ export function useMyTasksPage() {
         handleConfirmArchive,
         handleDeleteCommentClick,
         handleConfirmDeleteComment,
-        getStatusBadgeVariant,
-        getPriorityBadgeVariant,
         handlePostComment,
         handleSaveEditComment,
     };

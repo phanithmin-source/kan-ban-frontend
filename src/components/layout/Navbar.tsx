@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Columns, LogIn, LogOut, Menu , User, X , Users , LayoutDashboard, ListTodo } from "lucide-react";
+import { Columns, LogIn, LogOut, Menu, User, X, Users, LayoutDashboard, ListTodo } from "lucide-react";
 import clsx from "clsx";
 import { Button } from "../common";
 import { useAuth } from "../../hooks";
 import logoUrl from "../../assets/kanban-logo.svg";
 import ThemeToggle from "./ThemeToggle";
+import { getInitials } from "@/lib/utils";
 
 type Role = "USER" | "MANAGER" | "ADMIN";
 
@@ -53,17 +54,6 @@ function visibleLinks(role?: Role) {
   );
 }
 
-
-function initials(name?: string) {
-  if (!name) return "?";
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
-
 function NavItem({
   link,
   active,
@@ -109,7 +99,7 @@ export default function Navbar() {
           >
             <img src={logoUrl} alt="Kanban logo" className="h-10 w-10" />
             <div>
-              <div className="text-base font-semibold text-slate-900 dark:text-slate-100">Kanban Task Manager</div>
+              <div className="text-base font-semibold text-slate-905 dark:text-slate-105">Kanban Task Manager</div>
               <div className="text-sm text-slate-500 dark:text-slate-400">Organize your workflow</div>
             </div>
           </Link>
@@ -141,7 +131,7 @@ export default function Navbar() {
             <>
               <span className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                  {initials(user.name)}
+                  {getInitials(user.name)}
                 </span>
                 {user.name}
               </span>
@@ -195,7 +185,7 @@ export default function Navbar() {
                 <>
                   <div className="mb-3 flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                      {initials(user.name)}
+                      {getInitials(user.name)}
                     </span>
                     {user.name}
                   </div>
@@ -214,7 +204,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-primary/90"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-primary/95"
                   onClick={() => setMenuOpen(false)}
                 >
                   <LogIn className="h-4 w-4" />
@@ -226,5 +216,6 @@ export default function Navbar() {
         </div>
       ) : null}
     </nav>
+
   );
 }

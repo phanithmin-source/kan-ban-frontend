@@ -1,6 +1,7 @@
 import { Trash } from "lucide-react";
 import { Button } from "../common";
 import { Avatar, AvatarFallback, Dialog, DialogContent, DialogHeader, DialogTitle, Select } from "../ui";
+import { getInitials } from "@/lib/utils";
 import type { BoardQuery, GetUsersQuery } from "../../gql/graphql";
 
 type BoardType = NonNullable<BoardQuery["board"]>;
@@ -21,15 +22,6 @@ interface BoardMembersModalProps {
   canManageBoard: boolean;
 }
 
-function initials(name: string | null | undefined) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .substring(0, 2)
-    .toUpperCase();
-}
 
 export default function BoardMembersModal({
   isOpen,
@@ -102,7 +94,7 @@ export default function BoardMembersModal({
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="text-[10px]">
-                    {initials(m.user.name)}
+                    {getInitials(m.user.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
