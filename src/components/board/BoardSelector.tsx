@@ -1,5 +1,6 @@
 import { Users } from "lucide-react";
 import { Button } from "../common";
+import { Select } from "../ui";
 import type { BoardsQuery } from "../../gql/graphql";
 
 type BoardListType = BoardsQuery["boards"];
@@ -40,11 +41,11 @@ export default function BoardSelector({
         >
           Board:
         </label>
-        <select
+        <Select
           id="board-select"
           value={boardId}
           onChange={(e) => onSelectBoard(e.target.value)}
-          className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
+          className="min-w-[12rem] py-1.5 h-9"
         >
           <option value="" disabled>
             Select a board
@@ -59,7 +60,7 @@ export default function BoardSelector({
           {canCreateBoard && (
             <option value="CREATE_NEW">+ Create New Board</option>
           )}
-        </select>
+        </Select>
 
         {hasMembersAccess && (
           <Button

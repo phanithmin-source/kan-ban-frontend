@@ -22,15 +22,15 @@ export default function PageHeader({
         <div className={cn("mb-6 flex flex-wrap items-center justify-between gap-4", className)}>
             <div>
                 {label && (
-                    <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
+                    <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
                         {label}
                     </p>
                 )}
-                <h1 className={cn("mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl", titleClassName)}>
+                <h1 className={cn("mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl", titleClassName)}>
                     {title}
                 </h1>
                 {description && (
-                    <p className="mt-2 text-sm text-slate-600">
+                    <p className="mt-2 text-sm text-muted-foreground">
                         {description}
                     </p>
                 )}

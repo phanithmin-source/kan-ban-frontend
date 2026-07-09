@@ -57,8 +57,8 @@ export default function QuickActions() {
   if (visibleActions.length === 0) return null;
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">
+    <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-foreground">
         Quick Actions
       </h2>
 
@@ -69,7 +69,7 @@ export default function QuickActions() {
           return (
             <button
               key={action.label}
-              className="flex items-center gap-4 rounded-2xl border border-slate-200 p-4 text-left transition hover:border-primary hover:shadow-sm cursor-pointer w-full bg-white"
+              className="flex items-center gap-4 rounded-2xl border border-border p-4 text-left transition hover:border-primary hover:bg-muted hover:shadow-sm cursor-pointer w-full bg-card"
               onClick={action.onClick}
             >
               <div className="rounded-xl bg-primary/10 p-3 shrink-0">
@@ -77,10 +77,10 @@ export default function QuickActions() {
               </div>
 
               <div className="min-w-0">
-                <p className="font-semibold text-sm text-slate-900 truncate">
+                <p className="font-semibold text-sm text-foreground truncate">
                   {action.label}
                 </p>
-                <p className="text-xs text-slate-500 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {action.description}
                 </p>
               </div>

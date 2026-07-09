@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "../common";
+import { Input, Select, Textarea } from "../ui";
 import { type Task } from "../../types/task";
 
 interface TaskFormProps {
@@ -49,7 +50,6 @@ export default function TaskForm({ initial, onSubmit, onCancel }: TaskFormProps)
     });
   };
 
-  const fieldClass = "w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/60";
   const labelClass = "mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300";
 
   return (
@@ -58,11 +58,10 @@ export default function TaskForm({ initial, onSubmit, onCancel }: TaskFormProps)
         <label className={labelClass} htmlFor="task-title">
           Title
         </label>
-        <input
+        <Input
           id="task-title"
           type="text"
           {...register("title")}
-          className={fieldClass}
         />
         {errors.title ? (
           <p className="mt-1 text-xs text-danger">{errors.title.message}</p>
@@ -73,10 +72,9 @@ export default function TaskForm({ initial, onSubmit, onCancel }: TaskFormProps)
         <label className={labelClass} htmlFor="task-description">
           Description
         </label>
-        <textarea
+        <Textarea
           id="task-description"
           {...register("description")}
-          className={fieldClass}
           rows={4}
         />
         {errors.description ? (
@@ -89,16 +87,15 @@ export default function TaskForm({ initial, onSubmit, onCancel }: TaskFormProps)
           <label className={labelClass} htmlFor="task-status">
             Status
           </label>
-          <select
+          <Select
             id="task-status"
             {...register("status")}
-            className={fieldClass}
           >
             <option value="TODO">To Do</option>
             <option value="IN_PROGRESS">In Progress</option>
             <option value="REVIEW">Review</option>
             <option value="DONE">Done</option>
-          </select>
+          </Select>
           {errors.status ? (
             <p className="mt-1 text-xs text-danger">{errors.status.message}</p>
           ) : null}
@@ -107,15 +104,14 @@ export default function TaskForm({ initial, onSubmit, onCancel }: TaskFormProps)
           <label className={labelClass} htmlFor="task-priority">
             Priority
           </label>
-          <select
+          <Select
             id="task-priority"
             {...register("priority")}
-            className={fieldClass}
           >
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
             <option value="HIGH">High</option>
-          </select>
+          </Select>
           {errors.priority ? (
             <p className="mt-1 text-xs text-danger">{errors.priority.message}</p>
           ) : null}
@@ -126,11 +122,10 @@ export default function TaskForm({ initial, onSubmit, onCancel }: TaskFormProps)
         <label className={labelClass} htmlFor="task-duedate">
           Due date
         </label>
-        <input
+        <Input
           id="task-duedate"
           type="date"
           {...register("dueDate")}
-          className={fieldClass}
         />
         {errors.dueDate ? (
           <p className="mt-1 text-xs text-danger">{errors.dueDate.message}</p>

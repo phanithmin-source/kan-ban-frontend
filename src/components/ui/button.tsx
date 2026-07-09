@@ -1,5 +1,6 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -9,10 +10,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        primary: "bg-primary text-primary-foreground hover:bg-primary/80",
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
@@ -25,6 +27,8 @@ const buttonVariants = cva(
         xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        xl: "h-auto gap-2 px-4 py-3 rounded-3xl text-sm font-semibold [&_svg:not([class*='size-'])]:size-4",
+        pill: "h-auto gap-2 px-4 py-3 rounded-3xl text-sm font-semibold [&_svg:not([class*='size-'])]:size-4",
         icon: "size-8",
         "icon-xs":
           "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
@@ -40,19 +44,36 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
-  return (
-    <ButtonPrimitive
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+export interface ButtonProps extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {
+  icon?: React.ReactNode;
 }
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, icon, children, ...props }, ref) => {
+    const resolvedVariant = variant || "primary";
+    const resolvedSize =
+      size ||
+      ((resolvedVariant === "primary" ||
+        resolvedVariant === "secondary" ||
+        resolvedVariant === "ghost" ||
+        resolvedVariant === "outline" ||
+        resolvedVariant === "default")
+        ? "xl"
+        : "default");
+
+    return (
+      <ButtonPrimitive
+        ref={ref}
+        data-slot="button"
+        className={cn(buttonVariants({ variant: resolvedVariant, size: resolvedSize, className }))}
+        {...props}
+      >
+        {icon}
+        {children}
+      </ButtonPrimitive>
+    );
+  }
+);
+Button.displayName = "Button";
 
 export { Button, buttonVariants }

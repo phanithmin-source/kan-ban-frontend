@@ -6,7 +6,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
+@variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
    2. Theme Mapping
@@ -113,7 +113,7 @@
   --chart-1: #e2e8f0;
   --chart-2: #64748b;
   --chart-3: #475569;
-  --chart-4: #334155; 
+  --chart-4: #334155;
   --chart-5: #1e293b;
 
   --sidebar: #f8fafc;
@@ -130,24 +130,24 @@
    4. Dark Theme
    ========================================================================== */
 .dark {
-  --background: #0D1117;
-  --foreground: #e6edf3;
-  --card: #161b22;
-  --card-foreground: #e6edf3;
-  --popover: #1c2128;
-  --popover-foreground: #e6edf3;
+  --background: #080c14;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
   --primary: #4F8EF7;
   --primary-foreground: #ffffff;
-  --secondary: #22D3EE;
-  --secondary-foreground: #0D1117;
-  --muted: #21262d;
-  --muted-foreground: #8b949e;
-  --accent: #58a6ff;
-  --accent-foreground: #0D1117;
+  --secondary: #0ea5e9;
+  --secondary-foreground: #080c14;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
   --destructive: #da3633;
   --destructive-foreground: #ffffff;
-  --border: #30363d;
-  --input: #21262d;
+  --border: #1e293b;
+  --input: #1e293b;
   --ring: #4F8EF7;
 
   --chart-1: #388bfd;
@@ -156,13 +156,13 @@
   --chart-4: #f78166;
   --chart-5: #bc8cff;
 
-  --sidebar: #161b22;
-  --sidebar-foreground: #e6edf3;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
   --sidebar-primary: #4F8EF7;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #21262d;
-  --sidebar-accent-foreground: #e6edf3;
-  --sidebar-border: #30363d;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #1e293b;
   --sidebar-ring: #4F8EF7;
 }
 
@@ -187,13 +187,14 @@
     @apply font-sans;
   }
 
-  /* Cap transition and animation durations at 150ms for a faster, cleaner experience */
-  *:not([style*="transition"]) {
-    transition-duration: 150ms !important;
-  }
-
-  *:not(.animate-spin) {
-    animation-duration: 150ms !important;
+  /* Cap transition and animation durations at 150ms on interactive controls for a faster, cleaner experience */
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    transition-duration: 150ms;
   }
 
   /* Style all select dropdowns with a consistent chevron-down icon */
@@ -212,6 +213,7 @@
 
   /* Support prefers-reduced-motion standards */
   @media (prefers-reduced-motion: reduce) {
+
     *,
     ::before,
     ::after {

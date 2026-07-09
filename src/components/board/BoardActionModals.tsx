@@ -24,18 +24,25 @@ export default function BoardActionModals({
 }: BoardActionModalsProps) {
   if (!boardModal) return null;
 
+  const getBoardModalTitle = (type: typeof boardModal.type) => {
+    switch (type) {
+      case "create":
+        return "Create new board";
+      case "rename":
+        return "Rename board";
+      case "archive":
+        return "Archive board";
+      default:
+        return "Delete board";
+    }
+  };
+
   return (
     <Dialog open={!!boardModal} onOpenChange={(open) => { if (!open) setBoardModal(null); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {boardModal.type === "create"
-              ? "Create new board"
-              : boardModal.type === "rename"
-              ? "Rename board"
-              : boardModal.type === "archive"
-              ? "Archive board"
-              : "Delete board"}
+            {getBoardModalTitle(boardModal.type)}
           </DialogTitle>
         </DialogHeader>
 

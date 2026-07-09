@@ -5,10 +5,10 @@ const Table = React.forwardRef<
     HTMLTableElement,
     React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-    <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-sm">
         <table
             ref={ref}
-            className={cn("min-w-full divide-y divide-slate-200", className)}
+            className={cn("min-w-full divide-y divide-border", className)}
             {...props}
         />
     </div>
@@ -21,7 +21,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <thead
         ref={ref}
-        className={cn("bg-slate-50", className)}
+        className={cn("bg-muted/40", className)}
         {...props}
     />
 ));
@@ -33,7 +33,7 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <tbody
         ref={ref}
-        className={cn("divide-y divide-slate-200 bg-white", className)}
+        className={cn("divide-y divide-border bg-card", className)}
         {...props}
     />
 ));
@@ -46,7 +46,7 @@ const TableRow = React.forwardRef<
     <tr
         ref={ref}
         className={cn(
-            "hover:bg-slate-50 transition-colors",
+            "hover:bg-muted/50 transition-colors",
             className
         )}
         {...props}
@@ -61,7 +61,7 @@ const TableHead = React.forwardRef<
     <th
         ref={ref}
         className={cn(
-            "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500",
+            "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground",
             className
         )}
         {...props}
@@ -75,7 +75,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <td
         ref={ref}
-        className={cn("whitespace-nowrap px-6 py-4 text-sm text-slate-700", className)}
+        className={cn("whitespace-nowrap px-6 py-4 text-sm text-foreground", className)}
         {...props}
     />
 ));

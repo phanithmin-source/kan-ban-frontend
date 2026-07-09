@@ -2,6 +2,8 @@ import { Observable } from "@apollo/client";
 import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { tokenStorage } from "../utils/tokenStorage";
+import { print } from "graphql";
+import { RefreshTokenDocument } from "../gql/graphql";
 
 /**
  * Silently refreshes the access token when the server responds with an
@@ -20,13 +22,7 @@ async function fetchNewAccessToken(): Promise<string | null> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      query: `
-        mutation RefreshToken($token: String!) {
-          refreshToken(token: $token) {
-            accessToken
-          }
-        }
-      `,
+      query: print(RefreshTokenDocument),
       variables: { token: refreshToken },
     }),
   });
@@ -81,7 +77,7 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
         if (!newToken) {
           tokenStorage.clear();
           resolvePending(null);
-          window.location.href = "/login";
+          window.dispatchEvent(new CustomEvent("auth-session-expired"));
           observer.error(new Error("Session expired"));
           return;
         }
@@ -100,7 +96,7 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
       .catch(() => {
         tokenStorage.clear();
         resolvePending(null);
-        window.location.href = "/login";
+        window.dispatchEvent(new CustomEvent("auth-session-expired"));
         observer.error(new Error("Session expired"));
       })
       .finally(() => {

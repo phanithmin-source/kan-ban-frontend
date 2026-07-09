@@ -7,4 +7,6 @@ export { Input } from './Input';
 export { default as PageHeader } from './PageHeader';
 export { default as Pagination } from './Pagination';
 export * from './Table';
-export { Button as UiButton, buttonVariants } from './button';
+export { Button, buttonVariants } from './button';
+export { Select } from './Select';
+export { Textarea } from './Textarea';

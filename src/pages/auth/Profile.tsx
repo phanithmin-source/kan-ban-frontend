@@ -1,87 +1,31 @@
-import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation } from "@apollo/client/react";
 import { Pencil, X, Check } from "lucide-react";
-import { useAuth } from "../../hooks";
-import { Button } from "@/components";
-import { UpdateUserDocument, UserFieldsFragmentDoc } from "../../gql/graphql";
-import { useFragment } from "../../gql/fragment-masking";
-import { toast } from "sonner";
-
-const profileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().email("Please enter a valid email address"),
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
+import { useProfilePage } from "../../hooks";
+import { Button, Input } from "@/components";
 
 export default function Profile() {
-  const { user, updateUser: updateUserContext } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
-
-  const userRole = useMemo(() => {
-    if (!user) return "Guest";
-    return user.role === "ADMIN"
-      ? "Administrator"
-      : user.role === "MANAGER"
-      ? "Manager"
-      : "User";
-  }, [user]);
-
   const {
+    user,
+    isEditing,
+    setIsEditing,
+    serverError,
+    userRole,
     register,
     handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name ?? "",
-      email: user?.email ?? "",
-    },
-  });
-
-  const [updateUser] = useMutation(UpdateUserDocument);
-
-  const onSubmit = async (data: ProfileFormData) => {
-    if (!user) return;
-    setServerError(null);
-    try {
-      const { data: resData } = await updateUser({
-        variables: { id: user.id, input: data },
-      });
-      if (resData?.updateUser) {
-        const unmasked = useFragment(UserFieldsFragmentDoc, resData.updateUser);
-        updateUserContext(unmasked);
-      }
-      toast.success("Profile updated successfully");
-      setIsEditing(false);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Update failed";
-      setServerError(msg);
-      toast.error(msg);
-    }
-  };
-
-  const handleCancel = () => {
-    reset({ name: user?.name ?? "", email: user?.email ?? "" });
-    setServerError(null);
-    setIsEditing(false);
-  };
+    handleCancel,
+    errors,
+    isSubmitting,
+  } = useProfilePage();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="rounded-[2rem] border border-slate-200 bg-white/95 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-        <div className="mb-8 flex flex-col gap-4 rounded-[1.5rem] border border-slate-100 bg-slate-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="rounded-[2rem] border border-border bg-card/95 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+        <div className="mb-8 flex flex-col gap-4 rounded-[1.5rem] border border-border bg-muted/30 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Profile</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+            <p className="text-xs uppercase tracking-[0.32em] text-muted-foreground">Profile</p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Your account
             </h1>
-            <p className="mt-2 max-w-xl text-sm text-slate-600">
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               Review your account details and keep your profile up to date.
             </p>
           </div>
@@ -92,11 +36,11 @@ export default function Profile() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Personal Info */}
-          <section className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-6">
+          <section className="rounded-[1.5rem] border border-border bg-muted/20 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Personal info</h2>
-                <p className="mt-1 text-sm text-slate-600">
+                <h2 className="text-lg font-semibold text-foreground">Personal info</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
                   Basic account information used for authentication.
                 </p>
               </div>
@@ -105,7 +49,7 @@ export default function Profile() {
                   type="button"
                   onClick={() => setIsEditing(true)}
                   aria-label="Edit profile"
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:border-primary/30 hover:text-primary"
+                  className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-sm transition hover:border-primary/30 hover:text-primary cursor-pointer"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                   Edit
@@ -115,21 +59,21 @@ export default function Profile() {
 
             {isEditing ? (
               <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit}
                 className="mt-6 space-y-4"
               >
                 <div>
                   <label
                     htmlFor="profile-name"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                   >
                     Name
                   </label>
-                  <input
+                  <Input
                     id="profile-name"
                     type="text"
                     {...register("name")}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                    autoComplete="name"
                   />
                   {errors.name && (
                     <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
@@ -139,15 +83,15 @@ export default function Profile() {
                 <div>
                   <label
                     htmlFor="profile-email"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                   >
                     Email
                   </label>
-                  <input
+                  <Input
                     id="profile-email"
                     type="email"
                     {...register("email")}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                    autoComplete="email"
                   />
                   {errors.email && (
                     <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
@@ -155,7 +99,7 @@ export default function Profile() {
                 </div>
 
                 {serverError && (
-                  <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-600">
+                  <p className="rounded-2xl border border-red-200 bg-red-50/10 px-4 py-3 text-xs text-red-400">
                     {serverError}
                   </p>
                 )}
@@ -183,39 +127,39 @@ export default function Profile() {
               </form>
             ) : (
               <div className="mt-6 space-y-4">
-                <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Name</p>
-                  <p className="mt-2 text-base font-medium text-slate-900">
+                <div className="rounded-3xl border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Name</p>
+                  <p className="mt-2 text-base font-medium text-foreground">
                     {user?.name ?? "Anonymous"}
                   </p>
                 </div>
-                <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Email</p>
-                  <p className="mt-2 text-base font-medium text-slate-900">
+                <div className="rounded-3xl border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Email</p>
+                  <p className="mt-2 text-base font-medium text-foreground">
                     {user?.email ?? "Not available"}
                   </p>
                 </div>
-                <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Role</p>
-                  <p className="mt-2 text-base font-medium text-slate-900">{userRole}</p>
+                <div className="rounded-3xl border border-border bg-card p-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Role</p>
+                  <p className="mt-2 text-base font-medium text-foreground">{userRole}</p>
                 </div>
               </div>
             )}
           </section>
 
           {/* Security */}
-          <section className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Security</h2>
-            <p className="mt-2 text-sm text-slate-600">Manage your session and account details.</p>
+          <section className="rounded-[1.5rem] border border-border bg-muted/20 p-6">
+            <h2 className="text-lg font-semibold text-foreground">Security</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Manage your session and account details.</p>
 
             <div className="mt-6 grid gap-4">
-              <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Session status</p>
-                <p className="mt-2 text-base font-medium text-slate-900">Active</p>
+              <div className="rounded-3xl border border-border bg-card p-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Session status</p>
+                <p className="mt-2 text-base font-medium text-foreground">Active</p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Account ID</p>
-                <p className="mt-2 text-base font-medium text-slate-900">{user?.id ?? "n/a"}</p>
+              <div className="rounded-3xl border border-border bg-card p-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Account ID</p>
+                <p className="mt-2 text-base font-medium text-foreground">{user?.id ?? "n/a"}</p>
               </div>
             </div>
           </section>

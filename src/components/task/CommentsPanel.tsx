@@ -1,5 +1,6 @@
 import { MessageSquare, Send } from "lucide-react";
 import { Button } from "../common";
+import { Input } from "../ui";
 import { formatDate } from "@/lib/formatDate";
 
 interface CommentUser {
@@ -24,8 +25,8 @@ interface CommentsPanelProps {
   setEditingCommentId: (value: string | null) => void;
   editingCommentText: string;
   setEditingCommentText: (value: string) => void;
-  onSaveEditComment: (commentId: string) => void | Promise<void>;
-  onDeleteComment: (commentId: string) => void | Promise<void>;
+  onSaveEditComment: (commentId: string) => void | Promise<unknown>;
+  onDeleteComment: (commentId: string) => void | Promise<unknown>;
   currentUserId?: string;
   userBoardRole?: string;
   userGlobalRole?: string;
@@ -67,11 +68,10 @@ export default function CommentsPanel({
 
       {/* Comment Input */}
       <form onSubmit={onPostComment} className="flex gap-2">
-        <input
+        <Input
           value={commentInput}
           onChange={(e) => setCommentInput(e.target.value)}
           placeholder="Ask a question or post an update..."
-          className="flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/60"
         />
         <Button type="submit" className="rounded-2xl px-4 py-2">
           <Send className="h-4 w-4" />
@@ -96,34 +96,33 @@ export default function CommentsPanel({
                 {(String(c.user.id) === String(currentUserId) ||
                   userGlobalRole === "ADMIN" ||
                   userBoardRole === "OWNER") && (
-                  <div className="flex items-center gap-1.5">
-                    {editingCommentId !== c.id && String(c.user.id) === String(currentUserId) && (
+                    <div className="flex items-center gap-1.5">
+                      {editingCommentId !== c.id && String(c.user.id) === String(currentUserId) && (
+                        <button
+                          onClick={() => {
+                            setEditingCommentId(c.id);
+                            setEditingCommentText(c.content);
+                          }}
+                          className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-primary transition"
+                        >
+                          Edit
+                        </button>
+                      )}
                       <button
-                        onClick={() => {
-                          setEditingCommentId(c.id);
-                          setEditingCommentText(c.content);
-                        }}
-                        className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-primary transition"
+                        onClick={() => onDeleteComment(c.id)}
+                        className="text-[10px] font-semibold text-danger hover:underline transition"
                       >
-                        Edit
+                        Delete
                       </button>
-                    )}
-                    <button
-                      onClick={() => onDeleteComment(c.id)}
-                      className="text-[10px] font-semibold text-danger hover:underline transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
+                    </div>
+                  )}
               </div>
 
               {editingCommentId === c.id ? (
                 <div className="mt-2 flex gap-2">
-                  <input
+                  <Input
                     value={editingCommentText}
                     onChange={(e) => setEditingCommentText(e.target.value)}
-                    className="flex-1 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary/60"
                   />
                   <Button
                     onClick={() => onSaveEditComment(c.id)}

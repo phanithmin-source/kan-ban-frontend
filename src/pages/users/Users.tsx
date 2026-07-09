@@ -1,10 +1,5 @@
-import { useState, useMemo } from "react";
-import { useQuery, useMutation } from "@apollo/client/react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { AlertTriangle, Loader2, Search, Edit2, Trash2 } from "lucide-react";
-import { useAuth } from "../../hooks";
+import { useUsersPage } from "../../hooks";
 import {
   Button,
   StatePanel,
@@ -22,113 +17,28 @@ import {
   DialogTitle,
   ConfirmationDialog,
 } from "@/components";
-import { toast } from "sonner";
-import {
-  GetUsersDocument,
-  UpdateUserDocument,
-  DeleteUserDocument,
-} from "../../gql/graphql";
-
-// Form validation schema
-const editUserSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().email("Please enter a valid email address"),
-});
-
-type EditUserFormData = z.infer<typeof editUserSchema>;
-
-interface TargetUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
 
 export default function Users() {
-  const { user: currentUser } = useAuth();
-  const [search, setSearch] = useState("");
-  const [editingUser, setEditingUser] = useState<TargetUser | null>(null);
-  const [userToDelete, setUserToDelete] = useState<string | null>(null);
-
-  const { data, loading, error, refetch } = useQuery(GetUsersDocument);
-
-  const [updateUser, { loading: updating }] = useMutation(UpdateUserDocument, {
-    onCompleted: () => {
-      toast.success("User updated successfully");
-      setEditingUser(null);
-      void refetch();
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to update user");
-    },
-  });
-
-  const [deleteUser] = useMutation(DeleteUserDocument, {
-    onCompleted: () => {
-      toast.success("User deleted successfully");
-      void refetch();
-    },
-    onError: (err) => {
-      toast.error(err.message || "Failed to delete user");
-    },
-  });
-
-  // React hook form setup
   const {
+    currentUser,
+    search,
+    setSearch,
+    editingUser,
+    setEditingUser,
+    userToDelete,
+    setUserToDelete,
+    getRoleBadgeClass,
+    loading,
+    error,
+    updating,
     register,
     handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<EditUserFormData>({
-    resolver: zodResolver(editUserSchema),
-  });
-
-  // Prefill form when opening edit modal
-  const handleStartEdit = (user: TargetUser) => {
-    setEditingUser(user);
-    reset({
-      name: user.name,
-      email: user.email,
-    });
-  };
-
-  const handleSave = async (formData: EditUserFormData) => {
-    if (!editingUser) return;
-    await updateUser({
-      variables: {
-        id: editingUser.id,
-        input: formData,
-      },
-    });
-  };
-
-  const handleDeleteClick = (id: string) => {
-    if (String(id) === String(currentUser?.id)) {
-      toast.warning("You cannot delete your own admin account.");
-      return;
-    }
-    setUserToDelete(id);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!userToDelete) return;
-    await deleteUser({
-      variables: { id: userToDelete },
-    });
-    setUserToDelete(null);
-  };
-
-  // Client-side search filtering
-  const filteredUsers = useMemo(() => {
-    const list = data?.users ?? [];
-    if (!search.trim()) return list;
-
-    const term = search.toLowerCase();
-    return list.filter(
-      (u) =>
-        u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
-    );
-  }, [data, search]);
+    errors,
+    handleStartEdit,
+    handleDeleteClick,
+    handleConfirmDelete,
+    filteredUsers,
+  } = useUsersPage();
 
   if (loading) {
     return (
@@ -158,29 +68,30 @@ export default function Users() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Page Header */}
       <PageHeader
-        label="Security Control"
+        label="Workspace Settings"
         title="User Management"
-        description="Control member details, view authorization states, and manage system access."
+        description="View and manage user accounts, permissions, and roles within the workspace."
       />
 
-      {/* Filter and Search Bar */}
-      <div className="mb-6 max-w-md relative flex items-center">
-        <Search className="absolute left-3.5 top-1/2 h-4 w-4 shrink-0 -translate-y-1/2 text-slate-400 z-10" />
-        <Input
-          type="text"
-          placeholder="Search by name or email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-white rounded-2xl"
-        />
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute top-3.5 left-4 h-5 w-5 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search users by name or email..."
+            className="pl-12"
+          />
+        </div>
       </div>
 
-      {/* Main Table */}
+      {/* Users Table */}
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Member</TableHead>
-            <TableHead>Email Address</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -188,7 +99,7 @@ export default function Users() {
         <TableBody>
           {filteredUsers.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="py-8 text-center text-slate-400">
+              <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
                 No users matching filter criteria.
               </TableCell>
             </TableRow>
@@ -196,19 +107,14 @@ export default function Users() {
             filteredUsers.map((member) => (
               <TableRow key={member.id}>
                 <TableCell>
-                  <div className="text-sm font-semibold text-slate-900">{member.name}</div>
+                  <div className="text-sm font-semibold text-foreground">{member.name}</div>
                 </TableCell>
                 <TableCell>
                   {member.email}
                 </TableCell>
                 <TableCell>
                   <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold border ${member.role === "ADMIN"
-                        ? "bg-rose-50 border-rose-200 text-rose-700"
-                        : member.role === "MANAGER"
-                          ? "bg-amber-50 border-amber-200 text-amber-700"
-                          : "bg-emerald-50 border-emerald-200 text-emerald-700"
-                      }`}
+                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold border ${getRoleBadgeClass(member.role)}`}
                   >
                     {member.role}
                   </span>
@@ -218,8 +124,8 @@ export default function Users() {
                     <button
                       type="button"
                       onClick={() => handleStartEdit(member)}
-                      className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition"
-                      aria-label="Edit User"
+                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-primary transition"
+                      aria-label="Edit Details"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
@@ -227,7 +133,7 @@ export default function Users() {
                       type="button"
                       onClick={() => handleDeleteClick(member.id)}
                       disabled={String(member.id) === String(currentUser?.id)}
-                      className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-danger transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400"
+                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-rose-500/10 hover:text-danger transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
                       aria-label="Delete User"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -247,13 +153,15 @@ export default function Users() {
             <DialogTitle>Edit Member Details</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(handleSave)} className="mt-2 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-2 space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">Name</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500" htmlFor="user-edit-name">Name</label>
               <Input
+                id="user-edit-name"
                 type="text"
                 {...register("name")}
                 className="mt-2"
+                autoComplete="name"
               />
               {errors.name && (
                 <p className="mt-1 text-xs text-danger">{errors.name.message}</p>
@@ -261,11 +169,13 @@ export default function Users() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">Email Address</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500" htmlFor="user-edit-email">Email Address</label>
               <Input
+                id="user-edit-email"
                 type="email"
                 {...register("email")}
                 className="mt-2"
+                autoComplete="email"
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-danger">{errors.email.message}</p>
@@ -302,4 +212,3 @@ export default function Users() {
     </div>
   );
 }
-

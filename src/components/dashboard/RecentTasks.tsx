@@ -16,9 +16,9 @@ export default function RecentTasks({
   const { user } = useAuth();
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
 
-      <h2 className="text-lg font-semibold text-slate-900">
+      <h2 className="text-lg font-semibold text-foreground">
         Recent Tasks
       </h2>
 
@@ -38,7 +38,7 @@ export default function RecentTasks({
 
         ) : (
 
-          tasks.map((task)=>(
+          tasks.map((task) => (
             <TaskRow
               key={task.id}
               title={task.title}
