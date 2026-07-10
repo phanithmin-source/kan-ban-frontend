@@ -11,6 +11,7 @@ import {
   TableBody,
   TableCell,
   Input,
+  Select,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -179,6 +180,22 @@ export default function Users() {
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-danger">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500" htmlFor="user-edit-role">Role</label>
+              <Select
+                id="user-edit-role"
+                {...register("role")}
+                className="mt-2"
+              >
+                <option value="USER">USER</option>
+                <option value="MANAGER">MANAGER</option>
+                <option value="ADMIN">ADMIN</option>
+              </Select>
+              {errors.role && (
+                <p className="mt-1 text-xs text-danger">{errors.role.message}</p>
               )}
             </div>
 

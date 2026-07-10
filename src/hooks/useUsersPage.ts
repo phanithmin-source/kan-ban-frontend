@@ -16,6 +16,7 @@ import {
 export const editUserSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters").max(100),
     email: z.string().email("Please enter a valid email address"),
+    role: z.enum(["ADMIN", "MANAGER", "USER"]),
 });
 
 export type EditUserFormData = z.infer<typeof editUserSchema>;
@@ -94,6 +95,7 @@ export function useUsersPage() {
         reset({
             name: user.name,
             email: user.email,
+            role: user.role as "ADMIN" | "MANAGER" | "USER",
         });
     };
 

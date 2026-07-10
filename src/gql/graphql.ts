@@ -75,6 +75,7 @@ export type UpdateTaskInput = {
 export type UpdateUserInput = {
   email?: string | null | undefined;
   name?: string | null | undefined;
+  role?: Role | null | undefined;
 };
 
 export type LoginMutationVariables = Exact<{
