@@ -52,6 +52,11 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
 
   if (!isUnauthenticated) return;
 
+  // Prevent token refresh for Logout and RefreshToken operations
+  if (operation.operationName === "Logout" || operation.operationName === "RefreshToken") {
+    return;
+  }
+
   // Prevent infinite retry loop if this query was already retried
   const context = operation.getContext();
   if (context.hasRetried) return;

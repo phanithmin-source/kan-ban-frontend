@@ -66,6 +66,10 @@ export function AuthProvider({ children }: Props) {
 
       if (!payload) throw new Error("Login failed");
 
+      if (payload.accessToken && payload.refreshToken) {
+        tokenStorage.setTokens(payload.accessToken, payload.refreshToken);
+      }
+
       setUser(payload.user);
     },
     [loginMutation]
@@ -83,6 +87,10 @@ export function AuthProvider({ children }: Props) {
       const payload = data?.register;
 
       if (!payload) throw new Error("Register failed");
+
+      if (payload.accessToken && payload.refreshToken) {
+        tokenStorage.setTokens(payload.accessToken, payload.refreshToken);
+      }
 
       setUser(payload.user);
     },
