@@ -54,7 +54,7 @@ export default function BoardMembersModal({
               <Select
                 value={inviteUserId}
                 onChange={(e) => setInviteUserId(e.target.value)}
-                className="flex-1 min-w-[200px]"
+                className="flex-1 min-w-50"
               >
                 <option value="">Select a user</option>
                 {users
@@ -85,7 +85,7 @@ export default function BoardMembersModal({
         )}
 
         {/* Members List */}
-        <div className="max-h-[300px] overflow-y-auto space-y-3 pr-1">
+        <div className="max-h-75 overflow-y-auto space-y-3 pr-1">
           {boardMembers.map((m) => (
             <div
               key={m.id}

@@ -71,7 +71,7 @@ export default function CommentsPanel({
       </form>
 
       {/* Comment Feed */}
-      <div className="mt-6 space-y-4 max-h-[300px] overflow-y-auto pr-1">
+      <div className="mt-6 space-y-4 max-h-75 overflow-y-auto pr-1">
         {comments && comments.length > 0 ? (
           comments.map((c) => (
             <div key={c.id} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">

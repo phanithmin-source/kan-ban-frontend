@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getStatusBadgeVariant, getPriorityBadgeVariant } from "./taskConstants";
+import { getStatusBadgeVariant, getPriorityBadgeVariant } from "../lib/taskConstants";
 
 describe("taskConstants variant helpers", () => {
     describe("getStatusBadgeVariant", () => {

@@ -7,7 +7,7 @@ A full-featured Kanban task management frontend built with **React 19**, **TypeS
 ## ✨ Features
 
 - **Authentication** — Login, registration, and session restoration via JWT stored in `localStorage`
-- **Protected Routes** — Role-aware routing with `PrivateRoute` guard
+- **Protected Routes** — Role-aware routing with `ProtectedRoute` guard and `RoleHomeRedirect` redirection
 - **Kanban Board** — Drag-and-drop task cards across status columns powered by `@dnd-kit`
 - **List View** — Server-side paginated task table with search and priority filters
 - **Task CRUD** — Create, edit, archive, delete, assign, and move tasks
@@ -98,6 +98,15 @@ src/
 │   └── users/           # Admin user management table
 ├── routes/
 │   └── AppRoutes.tsx    # Route definitions and protected routing
+├── test/                # Centralized unit and component tests (Vitest + JSDOM)
+│   ├── setup.ts             # JSDOM global setup and imports
+│   ├── ProtectedRoute.test.tsx
+│   ├── TaskForm.test.tsx
+│   ├── tokenRefreshLink.test.ts
+│   ├── useBoardPermissions.test.ts
+│   ├── formatDate.test.ts
+│   ├── taskConstants.test.ts
+│   └── utils.test.ts
 ├── types/
 │   └── task.ts          # Shared Task and TaskStatus types
 ├── index.css            # Tailwind v4 + shadcn/ui semantic CSS variables
@@ -113,8 +122,8 @@ main.tsx
   └── ApolloProvider
         └── AuthProvider (session restore via Me query)
               └── App → AppRoutes
-                    ├── PublicRoute  → Login / Register
-                    └── PrivateRoute → Dashboard / Board / Tasks / Users / Profile / Me
+                    ├── Unauthenticated Routes → Login / Register
+                    └── ProtectedRoute (Role checking) → Dashboard / Board / Tasks / Users / Profile / Me
 ```
 
 **State Management** — All server state is managed through Apollo Client (reactive variables + cache). Local UI state lives in component `useState`.
@@ -214,6 +223,7 @@ Dark mode is supported via the `.dark` class toggle. All components consume sema
 |--------|---------|
 | `npm run dev` | Start Vite dev server with HMR |
 | `npm run build` | TypeScript check → Vite production bundle |
+| `npm run test` | Run all unit and component tests with Vitest |
 | `npm run preview` | Preview production build locally |
 | `npm run codegen` | Regenerate GraphQL types from schema |
 | `npm run lint` | Run ESLint across the project |

@@ -45,7 +45,7 @@ export default function BoardSelector({
           id="board-select"
           value={boardId}
           onChange={(e) => onSelectBoard(e.target.value)}
-          className="min-w-[12rem] py-1.5 h-9"
+          className="min-w-48 py-1.5 h-9"
         >
           <option value="" disabled>
             Select a board

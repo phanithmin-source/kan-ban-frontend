@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import SortableTaskCard from "./SortableTaskcard";
+import SortableTaskCard from "./SortableTaskCard";
 import { type Task, type TaskStatus } from "../../types/task";
 
 interface KanbanColumnProps {
@@ -54,7 +54,7 @@ export default function KanbanColumn({
       </div>
 
       <SortableContext items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
-        <div className="min-h-[96px] space-y-4">
+        <div className="min-h-24 space-y-4">
           {tasks.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 px-3 py-6 text-center text-xs text-slate-400 dark:text-slate-500">
               Drop a task here

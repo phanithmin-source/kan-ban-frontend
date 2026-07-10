@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn, getInitials } from "./utils";
+import { cn, getInitials } from "../lib/utils";
 
 describe("getInitials", () => {
     it("extracts single initial for single name", () => {

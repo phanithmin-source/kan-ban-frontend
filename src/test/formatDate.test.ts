@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatDate } from "./formatDate";
+import { formatDate } from "../lib/formatDate";
 
 describe("formatDate utility", () => {
     it("returns null for null, undefined, or empty values", () => {
