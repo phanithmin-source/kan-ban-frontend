@@ -31,7 +31,7 @@ export function useBoardTasks({
   } = useQuery(TasksDocument, {
     variables: {
       page: 1,
-      limit: 1000,
+      limit: 200,
       search: search || undefined,
       priority: priorityFilter === "ALL" ? undefined : priorityFilter,
       boardId: boardId || undefined,
@@ -40,7 +40,7 @@ export function useBoardTasks({
   });
 
   const filteredTasks = useMemo(() => {
-    return (kanbanTasksData?.tasks?.data ?? []) as unknown as Task[];
+    return (kanbanTasksData?.tasks?.data ?? []) as Task[];
   }, [kanbanTasksData]);
 
   const [optimisticTasks, setOptimisticTasks] = useOptimistic(
@@ -48,7 +48,7 @@ export function useBoardTasks({
     (state, update: { id: string; status: TaskStatus }) => {
       return state.map((task) =>
         task.id === update.id
-          ? ({ ...task, status: update.status } as unknown as Task)
+          ? ({ ...task, status: update.status } as Task)
           : task
       );
     }

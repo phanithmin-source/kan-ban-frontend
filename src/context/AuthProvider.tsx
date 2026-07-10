@@ -120,6 +120,19 @@ export function AuthProvider({ children }: Props) {
     client.clearStore();
   }, [client, logoutMutation]);
 
+  /**
+   * SESSION EXPIRED EVENT LISTENER
+   */
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      logout();
+    };
+    window.addEventListener("auth-session-expired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("auth-session-expired", handleSessionExpired);
+    };
+  }, [logout]);
+
   const updateUser = useCallback((updatedUser: Partial<AuthUser>) => {
     setUser((prev) => (prev ? { ...prev, ...updatedUser } : null));
   }, []);

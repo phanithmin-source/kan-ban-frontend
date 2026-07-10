@@ -4,6 +4,7 @@ import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Badge, P
 import { type TasksQuery } from "../../gql/graphql";
 import { type Task } from "../../types/task";
 import { formatDate } from "@/lib/formatDate";
+import { getStatusBadgeVariant, getPriorityBadgeVariant } from "@/lib/taskConstants";
 
 interface BoardListViewProps {
     loading: boolean;
@@ -89,26 +90,12 @@ export default function BoardListView({
                                 )}
                             </TableCell>
                             <TableCell>
-                                <Badge variant={
-                                    task.status === "DONE"
-                                        ? "success"
-                                        : task.status === "REVIEW"
-                                            ? "warning"
-                                            : task.status === "IN_PROGRESS"
-                                                ? "info"
-                                                : "secondary"
-                                }>
+                                <Badge variant={getStatusBadgeVariant(task.status)}>
                                     {task.status.replaceAll("_", " ")}
                                 </Badge>
                             </TableCell>
                             <TableCell>
-                                <Badge variant={
-                                    task.priority === "HIGH"
-                                        ? "destructive"
-                                        : task.priority === "MEDIUM"
-                                            ? "warning"
-                                            : "success"
-                                }>
+                                <Badge variant={getPriorityBadgeVariant(task.priority)}>
                                     {task.priority}
                                 </Badge>
                             </TableCell>
@@ -121,7 +108,7 @@ export default function BoardListView({
                             <TableCell className="text-right">
                                 <button
                                     type="button"
-                                    onClick={() => setActiveTask(task as unknown as Task)}
+                                    onClick={() => setActiveTask(task as Task)}
                                     className="text-primary hover:text-primary-dark transition hover:underline"
                                 >
                                     View Details
@@ -142,3 +129,4 @@ export default function BoardListView({
         </div>
     );
 }
+

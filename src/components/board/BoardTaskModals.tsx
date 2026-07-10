@@ -19,7 +19,7 @@ interface BoardTaskModalsProps {
   canManageBoard: boolean;
   userBoardRole?: string;
   user: AuthUser | null;
-  
+
   // Comments state/handlers
   commentInput: string;
   setCommentInput: (val: string) => void;
@@ -118,7 +118,7 @@ export default function BoardTaskModals({
     <>
       {activeTask && (
         <TaskDetailsModal
-          activeTask={(taskDetailsData?.task as unknown as Task) || activeTask}
+          activeTask={(taskDetailsData?.task as Task) || activeTask}
           setActiveTask={setActiveTask}
           editingTask={editingTask}
           setEditingTask={setEditingTask}

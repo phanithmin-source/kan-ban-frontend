@@ -1,7 +1,7 @@
 import { Button } from "../common";
 import TaskForm from "./TaskForm";
 import CommentsPanel from "./CommentsPanel";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Select } from "../ui";
 import type { Task, TaskStatus } from "../../types/task";
 import type { BoardQuery } from "../../gql/graphql";
 import { formatDate } from "@/lib/formatDate";
@@ -23,25 +23,22 @@ interface TaskDetailsModalProps {
   onAssignTask: (taskId: string, userId: string, selectedMemberUser: Task["assignee"]) => void | Promise<unknown>;
   onChangeTaskStatus: (task: Task, status: TaskStatus) => void | Promise<unknown>;
   onUpdateTask: (updatedData: Omit<Task, "id" | "createdAt" | "updatedAt" | "assignee" | "isArchived" | "creator" | "comments" | "board">) => void | Promise<void>;
-  onArchiveTask: (taskId: string) => void | Promise<void>;
-  onDeleteTask: (taskId: string) => void | Promise<void>;
-  
-  // comments panel forwarding props
+  onDeleteTask: (taskId: string) => void | Promise<unknown>;
+  onArchiveTask: (taskId: string) => void | Promise<unknown>;
+  onDeleteComment: (commentId: string) => void | Promise<unknown>;
+  onPostComment: (e: React.FormEvent) => void | Promise<void>;
   commentInput: string;
   setCommentInput: (value: string) => void;
-  onPostComment: (e: React.FormEvent) => void | Promise<void>;
   editingCommentId: string | null;
   setEditingCommentId: (value: string | null) => void;
   editingCommentText: string;
   setEditingCommentText: (value: string) => void;
   onSaveEditComment: (commentId: string) => void | Promise<void>;
-  onDeleteComment: (commentId: string) => void | Promise<void>;
 }
 
-const infoCardClass = "rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4";
-const labelClass = "text-sm uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400";
-const valueClass = "mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100";
-const valueSmClass = "mt-2 text-sm text-slate-700 dark:text-slate-300";
+const infoCardClass = "rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 shadow-xs";
+const labelClass = "text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500";
+const valueSmClass = "mt-2 text-sm font-semibold text-slate-805 dark:text-slate-205";
 
 export default function TaskDetailsModal({
   activeTask,
@@ -57,93 +54,92 @@ export default function TaskDetailsModal({
   onAssignTask,
   onChangeTaskStatus,
   onUpdateTask,
-  onArchiveTask,
   onDeleteTask,
-  
+  onArchiveTask,
+  onDeleteComment,
+  onPostComment,
   commentInput,
   setCommentInput,
-  onPostComment,
   editingCommentId,
   setEditingCommentId,
   editingCommentText,
   setEditingCommentText,
   onSaveEditComment,
-  onDeleteComment,
 }: TaskDetailsModalProps) {
   if (!activeTask) return null;
 
   return (
-    <Dialog open={!!activeTask} onOpenChange={(open) => { if (!open) { setActiveTask(null); setEditingTask(null); } }}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto pr-6">
+    <Dialog open={!!activeTask} onOpenChange={(open) => { if (!open) setActiveTask(null); }}>
+      <DialogContent className="max-w-3xl overflow-y-auto max-h-[85vh] p-6 sm:p-8">
         <DialogHeader>
-          <DialogTitle>{activeTask.title}</DialogTitle>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span>Task Details</span>
+            <span>•</span>
+            <span className="text-primary">{activeTask.board?.name ?? "Board"}</span>
+          </div>
+          <DialogTitle className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {activeTask.title}
+          </DialogTitle>
         </DialogHeader>
 
-        {editingTask && editingTask.id === activeTask.id ? (
-          <div className="mt-2">
+        {editingTask ? (
+          <div className="mt-4">
             <TaskForm
               initial={activeTask}
-              onSubmit={onUpdateTask}
+              onSubmit={async (updatedData) => {
+                await onUpdateTask(updatedData);
+                setEditingTask(null);
+              }}
               onCancel={() => setEditingTask(null)}
             />
           </div>
         ) : (
-          <div className="space-y-6 mt-2">
-            <div className="grid gap-4 md:grid-cols-2">
+          <div className="mt-4 space-y-6">
+            {/* Task Info Grid */}
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               <div className={infoCardClass}>
                 <p className={labelClass}>Status</p>
-                <p className={valueClass}>
-                  {activeTask.status.replaceAll("_", " ")}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {STATUS_ORDER.map((s) => {
-                    const canMove =
-                      canEditTasks &&
-                      (userGlobalRole === "ADMIN" ||
-                        userGlobalRole === "MANAGER" ||
-                        userBoardRole === "OWNER" ||
-                        activeTask.assignee?.id && String(activeTask.assignee.id) === String(currentUserId));
-                    return (
-                      <button
-                        key={s}
-                        type="button"
-                        disabled={activeTask.status === s || !canMove}
-                        onClick={async () => {
-                          await onChangeTaskStatus(activeTask, s);
-                          setActiveTask({ ...activeTask, status: s });
-                        }}
-                        className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
-                          activeTask.status === s
-                            ? "bg-primary text-white cursor-default"
-                            : "border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary/40 hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
-                        }`}
-                      >
-                        {s.replaceAll("_", " ")}
-                      </button>
-                    );
-                  })}
-                </div>
+                {canEditTasks ? (
+                  <div className="mt-1">
+                    <Select
+                      value={activeTask.status}
+                      onChange={async (e) =>
+                        await onChangeTaskStatus(activeTask, e.target.value as TaskStatus)
+                      }
+                      className="py-1 cursor-pointer h-8 text-xs"
+                    >
+                      {STATUS_ORDER.map((status) => (
+                        <option key={status} value={status}>
+                          {status.replace("_", " ")}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {activeTask.status.replace("_", " ")}
+                  </p>
+                )}
               </div>
               <div className={infoCardClass}>
                 <p className={labelClass}>Priority</p>
-                <p className={valueClass}>
-                  {activeTask.priority}
-                </p>
+                <div className="mt-2.5">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase border ${activeTask.priority === "HIGH"
+                        ? "bg-rose-500/10 text-danger border-rose-500/20"
+                        : activeTask.priority === "MEDIUM"
+                          ? "bg-amber-500/10 text-amber-505 dark:text-amber-405 border-amber-500/20"
+                          : "bg-emerald-500/10 text-emerald-505 dark:text-emerald-405 border-emerald-500/20"
+                      }`}
+                  >
+                    {activeTask.priority}
+                  </span>
+                </div>
               </div>
-            </div>
-
-            <div className={infoCardClass}>
-              <p className={labelClass}>Description</p>
-              <p className={valueSmClass}>
-                {activeTask.description || "No description added."}
-              </p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <div className={infoCardClass}>
-                <p className={labelClass}>Due date</p>
+                <p className={labelClass}>Due Date</p>
                 <p className={valueSmClass}>
-                  {formatDate(activeTask.dueDate) || "No due date"}
+                  {activeTask.dueDate ? formatDate(activeTask.dueDate) : "No due date"}
                 </p>
               </div>
               <div className={infoCardClass}>
@@ -153,15 +149,9 @@ export default function TaskDetailsModal({
                 </p>
               </div>
               <div className={infoCardClass}>
-                <p className={labelClass}>Creator</p>
-                <p className={valueSmClass}>
-                  {activeTask.creator?.name || "System"}
-                </p>
-              </div>
-              <div className={infoCardClass}>
                 <p className={labelClass}>Assignee</p>
                 {canEditTasks ? (
-                  <select
+                  <Select
                     value={activeTask.assignee?.id ?? ""}
                     onChange={async (e) => {
                       const val = e.target.value;
@@ -174,7 +164,7 @@ export default function TaskDetailsModal({
                         );
                       }
                     }}
-                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary/60 cursor-pointer"
+                    className="mt-1 w-full py-1 cursor-pointer h-8 text-xs"
                   >
                     <option value="">Unassigned</option>
                     {boardMembers?.map((m) => (
@@ -182,7 +172,7 @@ export default function TaskDetailsModal({
                         {m.user.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 ) : (
                   <p className={valueSmClass}>
                     {activeTask.assignee?.name || "Unassigned"}

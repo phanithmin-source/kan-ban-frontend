@@ -1,6 +1,7 @@
 import { Trash } from "lucide-react";
 import { Button } from "../common";
-import { Avatar, AvatarFallback, Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui";
+import { Avatar, AvatarFallback, Dialog, DialogContent, DialogHeader, DialogTitle, Select } from "../ui";
+import { getInitials } from "@/lib/utils";
 import type { BoardQuery, GetUsersQuery } from "../../gql/graphql";
 
 type BoardType = NonNullable<BoardQuery["board"]>;
@@ -21,15 +22,6 @@ interface BoardMembersModalProps {
   canManageBoard: boolean;
 }
 
-function initials(name: string | null | undefined) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .substring(0, 2)
-    .toUpperCase();
-}
 
 export default function BoardMembersModal({
   isOpen,
@@ -47,8 +39,6 @@ export default function BoardMembersModal({
 }: BoardMembersModalProps) {
   const boardMembers = board.members ?? [];
 
-  const selectClass = "rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary/60 cursor-pointer";
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="max-w-lg">
@@ -61,10 +51,10 @@ export default function BoardMembersModal({
           <div className="border-b border-slate-100 dark:border-slate-700 pb-4">
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Add New Member</h3>
             <div className="flex flex-wrap gap-2">
-              <select
+              <Select
                 value={inviteUserId}
                 onChange={(e) => setInviteUserId(e.target.value)}
-                className="flex-1 min-w-[200px] rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
+                className="flex-1 min-w-[200px]"
               >
                 <option value="">Select a user</option>
                 {users
@@ -74,15 +64,15 @@ export default function BoardMembersModal({
                       {u.name} ({u.email})
                     </option>
                   ))}
-              </select>
-              <select
+              </Select>
+              <Select
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value as "MEMBER" | "VIEWER")}
-                className="w-32 rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/60 cursor-pointer"
+                className="w-32"
               >
                 <option value="MEMBER">Member</option>
                 <option value="VIEWER">Viewer</option>
-              </select>
+              </Select>
               <Button
                 onClick={onInvite}
                 disabled={!inviteUserId}
@@ -104,7 +94,7 @@ export default function BoardMembersModal({
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="text-[10px]">
-                    {initials(m.user.name)}
+                    {getInitials(m.user.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -117,14 +107,14 @@ export default function BoardMembersModal({
                 {/* Role selector (only if owner/admin, and not the board owner) */}
                 {canManageBoard && m.role !== "OWNER" ? (
                   <>
-                    <select
+                    <Select
                       value={m.role}
                       onChange={(e) => onUpdateRole(m.user.id, e.target.value as "MEMBER" | "VIEWER")}
-                      className={selectClass}
+                      className="w-28 py-1 h-8 text-xs"
                     >
                       <option value="MEMBER">Member</option>
                       <option value="VIEWER">Viewer</option>
-                    </select>
+                    </Select>
                     <button
                       type="button"
                       onClick={() => onRemoveMember(m.user.id)}
