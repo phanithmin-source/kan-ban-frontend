@@ -30,13 +30,6 @@ export function AuthProvider({ children }: Props) {
    */
   useEffect(() => {
     const restoreSession = async () => {
-      const token = tokenStorage.getAccessToken();
-
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const { data } = await client.query({
           query: MeDocument,
@@ -73,11 +66,6 @@ export function AuthProvider({ children }: Props) {
 
       if (!payload) throw new Error("Login failed");
 
-      tokenStorage.setTokens(
-        payload.accessToken,
-        payload.refreshToken
-      );
-
       setUser(payload.user);
     },
     [loginMutation]
@@ -95,11 +83,6 @@ export function AuthProvider({ children }: Props) {
       const payload = data?.register;
 
       if (!payload) throw new Error("Register failed");
-
-      tokenStorage.setTokens(
-        payload.accessToken,
-        payload.refreshToken
-      );
 
       setUser(payload.user);
     },

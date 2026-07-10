@@ -9,6 +9,7 @@ import { cache } from "./cache";
 
 const httpLink = new HttpLink({
   uri: import.meta.env.VITE_GRAPHQL_URL,
+  credentials: "include",
 });
 
 export const client = new ApolloClient({

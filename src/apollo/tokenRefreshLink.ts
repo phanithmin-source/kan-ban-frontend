@@ -16,15 +16,15 @@ const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL as string;
 
 async function fetchNewAccessToken(): Promise<string | null> {
   const refreshToken = tokenStorage.getRefreshToken();
-  if (!refreshToken) return null;
 
   const response = await fetch(GRAPHQL_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       query: print(RefreshTokenDocument),
-      variables: { token: refreshToken },
+      variables: { token: refreshToken || undefined },
     }),
+    credentials: "include",
   });
 
   const json = (await response.json()) as {
@@ -60,8 +60,12 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
           observer.error(new Error("Session expired"));
           return;
         }
+        const existingRefresh = tokenStorage.getRefreshToken();
         operation.setContext(({ headers = {} }: { headers: Record<string, string> }) => ({
-          headers: { ...headers, Authorization: `Bearer ${newToken}` },
+          headers: {
+            ...headers,
+            ...(existingRefresh ? { Authorization: `Bearer ${newToken}` } : {}),
+          },
         }));
         const sub = forward(operation).subscribe(observer);
         return () => sub.unsubscribe();
@@ -82,12 +86,17 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
           return;
         }
 
-        const existingRefresh = tokenStorage.getRefreshToken()!;
-        tokenStorage.setTokens(newToken, existingRefresh);
+        const existingRefresh = tokenStorage.getRefreshToken();
+        if (existingRefresh) {
+          tokenStorage.setTokens(newToken, existingRefresh);
+        }
         resolvePending(newToken);
 
         operation.setContext(({ headers = {} }: { headers: Record<string, string> }) => ({
-          headers: { ...headers, Authorization: `Bearer ${newToken}` },
+          headers: {
+            ...headers,
+            ...(existingRefresh ? { Authorization: `Bearer ${newToken}` } : {}),
+          },
         }));
 
         const sub = forward(operation).subscribe(observer);

@@ -4,12 +4,14 @@ import { tokenStorage } from "../utils/tokenStorage";
 export const authLink = new ApolloLink((operation, forward) => {
   const token = tokenStorage.getAccessToken();
 
-  operation.setContext(({ headers = {} }) => ({
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-  }));
+  if (token) {
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${token}`,
+      },
+    }));
+  }
 
   return forward(operation);
 });
