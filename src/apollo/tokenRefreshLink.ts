@@ -52,6 +52,10 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
 
   if (!isUnauthenticated) return;
 
+  // Prevent infinite retry loop if this query was already retried
+  const context = operation.getContext();
+  if (context.hasRetried) return;
+
   // If already refreshing, queue and wait
   if (isRefreshing) {
     return new Observable((observer) => {
@@ -66,6 +70,7 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
             ...headers,
             ...(existingRefresh ? { Authorization: `Bearer ${newToken}` } : {}),
           },
+          hasRetried: true, // Mark as retried
         }));
         const sub = forward(operation).subscribe(observer);
         return () => sub.unsubscribe();
@@ -97,6 +102,7 @@ export const tokenRefreshLink = new ErrorLink(({ error, operation, forward }) =>
             ...headers,
             ...(existingRefresh ? { Authorization: `Bearer ${newToken}` } : {}),
           },
+          hasRetried: true, // Mark as retried
         }));
 
         const sub = forward(operation).subscribe(observer);
