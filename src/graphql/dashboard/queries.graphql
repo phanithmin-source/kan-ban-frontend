@@ -1,34 +1,48 @@
-query DashboardTasks {
-  tasks(
-    filter: {
-      page: 1
-      limit: 100
+query DashboardData(
+  $recentTasksFilter: TaskFilterInput!
+  $doneFilter: TaskFilterInput!
+  $progressFilter: TaskFilterInput!
+  $includeUsers: Boolean!
+) {
+  boards {
+    id
+    name
+    isArchived
+    createdAt
+    updatedAt
+    owner {
+      id
+      name
+      email
     }
-  ) {
+  }
+  recentTasks: tasks(filter: $recentTasksFilter) {
     data {
       id
       title
       status
       priority
-
       board {
         id
         name
       }
-
       assignee {
         id
         name
       }
     }
-
     total
   }
-}
-
-# Accurate count for each status
-query TaskCountByStatus($status: TaskStatus!) {
-  tasks(filter: { status: $status, page: 1, limit: 1 }) {
+  doneTasks: tasks(filter: $doneFilter) {
     total
+  }
+  progressTasks: tasks(filter: $progressFilter) {
+    total
+  }
+  users @include(if: $includeUsers) {
+    id
+    name
+    email
+    role
   }
 }

@@ -1,59 +1,36 @@
 import { useQuery } from "@apollo/client/react";
 import { useAuth } from "./useAuth";
-import {
-  BoardsDocument,
-  DashboardTasksDocument,
-  GetUsersDocument,
-  TaskCountByStatusDocument,
-} from "../gql/graphql";
+import { DashboardDataDocument } from "../gql/graphql";
 
 export function useDashboard() {
   const { user } = useAuth();
 
-  const {
-    data: boardsData,
-    loading: boardsLoading,
-    error: boardsError,
-  } = useQuery(BoardsDocument);
-
-  const {
-    data: tasksData,
-    loading: tasksLoading,
-    error: tasksError,
-  } = useQuery(DashboardTasksDocument);
-
-  const {
-    data: usersData,
-    loading: usersLoading,
-    error: usersError,
-  } = useQuery(GetUsersDocument, {
-    skip: user?.role !== "ADMIN" && user?.role !== "MANAGER",
+  const { data, loading, error } = useQuery(DashboardDataDocument, {
+    variables: {
+      recentTasksFilter: { page: 1, limit: 5 },
+      doneFilter: { status: "DONE", page: 1, limit: 1 },
+      progressFilter: { status: "IN_PROGRESS", page: 1, limit: 1 },
+      includeUsers: user?.role === "ADMIN" || user?.role === "MANAGER",
+    },
   });
 
-  // Accurate status-based counts from the backend — not derived from a partial list
-  const { data: doneData } = useQuery(TaskCountByStatusDocument, {
-    variables: { status: "DONE" },
-  });
-
-  const { data: progressData } = useQuery(TaskCountByStatusDocument, {
-    variables: { status: "IN_PROGRESS" },
-  });
-
-  const tasks = tasksData?.tasks.data ?? [];
+  const boards = data?.boards ?? [];
+  const recentTasks = data?.recentTasks.data ?? [];
+  const totalTasks = data?.recentTasks.total ?? 0;
+  const doneTasksTotal = data?.doneTasks.total ?? 0;
+  const progressTasksTotal = data?.progressTasks.total ?? 0;
+  const users = data?.users ?? [];
 
   return {
     dashboard: {
-      boards: boardsData?.boards.length ?? 0,
-      tasks: tasksData?.tasks.total ?? 0,
-      users: usersData?.users.length ?? 0,
-      completed: doneData?.tasks.total ?? 0,
-      progress: progressData?.tasks.total ?? 0,
-      recentTasks: tasks.slice(0, 5),
+      boards: boards.length,
+      tasks: totalTasks,
+      users: users.length,
+      completed: doneTasksTotal,
+      progress: progressTasksTotal,
+      recentTasks,
     },
-    loading:
-      boardsLoading ||
-      tasksLoading ||
-      (usersLoading && (user?.role === "ADMIN" || user?.role === "MANAGER")),
-    error: boardsError || tasksError || usersError,
+    loading,
+    error,
   };
 }

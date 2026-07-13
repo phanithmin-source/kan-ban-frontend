@@ -11,6 +11,7 @@ interface UseBoardTasksProps {
   priorityFilter: "ALL" | TaskPriority;
   canEditTasks: boolean;
   changeTaskStatus: (task: Task, status: TaskStatus) => Promise<unknown>;
+  skip?: boolean;
 }
 
 export function useBoardTasks({
@@ -19,6 +20,7 @@ export function useBoardTasks({
   priorityFilter,
   canEditTasks,
   changeTaskStatus,
+  skip,
 }: UseBoardTasksProps) {
   const [, startTransition] = useTransition();
 
@@ -31,12 +33,12 @@ export function useBoardTasks({
   } = useQuery(TasksDocument, {
     variables: {
       page: 1,
-      limit: 10,
+      limit: 100,
       search: search || undefined,
       priority: priorityFilter === "ALL" ? undefined : priorityFilter,
       boardId: boardId || undefined,
     },
-    skip: !boardId,
+    skip: skip || !boardId,
   });
 
   const filteredTasks = useMemo(() => {

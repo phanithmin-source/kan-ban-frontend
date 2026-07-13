@@ -45,6 +45,8 @@ export function useBoardPage(boardId: string) {
     inviteUserId,
     setInviteUserId,
     inviteRole,
+    membersModalOpen,
+    viewMode,
   } = state;
 
   const boardModalInputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +54,9 @@ export function useBoardPage(boardId: string) {
   // ── Queries ─────────────────────────────────────────────────────────────────
   const { data: boardsData, loading: boardsLoading, error: boardsError } = useQuery(BoardsDocument);
   const { board, loading, error, refetch } = useBoard(boardId);
-  const { data: usersData } = useQuery(GetUsersDocument);
+  const { data: usersData } = useQuery(GetUsersDocument, {
+    skip: !membersModalOpen || (user?.role !== "ADMIN" && user?.role !== "MANAGER"),
+  });
 
   const { data: taskDetailsData, refetch: refetchTaskDetails } = useQuery(TaskDocument, {
     variables: { id: activeTask?.id ?? "" },
@@ -72,7 +76,7 @@ export function useBoardPage(boardId: string) {
       priority: priorityFilter === "ALL" ? undefined : priorityFilter,
       boardId: boardId || undefined,
     },
-    skip: !boardId,
+    skip: !boardId || viewMode !== "LIST",
   });
 
   // ── Permissions ──────────────────────────────────────────────────────────────
@@ -118,7 +122,6 @@ export function useBoardPage(boardId: string) {
     },
   });
 
-  // ── Kanban drag-and-drop ─────────────────────────────────────────────────────
   const {
     optimisticTasks,
     tasksByColumn,
@@ -126,7 +129,14 @@ export function useBoardPage(boardId: string) {
     kanbanTasksLoading,
     kanbanTasksError,
     refetchKanbanTasks,
-  } = useBoardTasks({ boardId, search, priorityFilter, canEditTasks, changeTaskStatus });
+  } = useBoardTasks({
+    boardId,
+    search,
+    priorityFilter,
+    canEditTasks,
+    changeTaskStatus,
+    skip: !boardId || viewMode !== "BOARD",
+  });
 
   // ── Mutation wrappers ────────────────────────────────────────────────────────
   const {

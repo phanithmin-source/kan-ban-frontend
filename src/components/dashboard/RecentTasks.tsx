@@ -1,10 +1,10 @@
 import { useAuth } from "../../hooks";
 import TaskRow from "./TaskRow";
 import EmptyState from "./EmptyState";
-import type { DashboardTasksQuery } from "../../gql/graphql";
+import type { DashboardDataQuery } from "../../gql/graphql";
 
 type RecentTask =
-  DashboardTasksQuery["tasks"]["data"][number];
+  DashboardDataQuery["recentTasks"]["data"][number];
 
 interface Props {
   tasks: RecentTask[];
