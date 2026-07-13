@@ -31,7 +31,7 @@ export function useBoardTasks({
   } = useQuery(TasksDocument, {
     variables: {
       page: 1,
-      limit: 200,
+      limit: 10,
       search: search || undefined,
       priority: priorityFilter === "ALL" ? undefined : priorityFilter,
       boardId: boardId || undefined,
