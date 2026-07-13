@@ -24,26 +24,95 @@ export function useBoardTasks({
 }: UseBoardTasksProps) {
   const [, startTransition] = useTransition();
 
-  // Kanban task queries (fully backend-filtered and backend-searched)
+  // Kanban task queries (fully backend-filtered and backend-searched, status-specific)
   const {
-    data: kanbanTasksData,
-    loading: kanbanTasksLoading,
-    error: kanbanTasksError,
-    refetch: refetchKanbanTasks,
+    data: todoData,
+    loading: todoLoading,
+    error: todoError,
+    refetch: refetchTodo,
   } = useQuery(TasksDocument, {
     variables: {
       page: 1,
-      limit: 100,
+      limit: 50,
       search: search || undefined,
       priority: priorityFilter === "ALL" ? undefined : priorityFilter,
       boardId: boardId || undefined,
+      status: "TODO",
     },
     skip: skip || !boardId,
   });
 
+  const {
+    data: inProgressData,
+    loading: inProgressLoading,
+    error: inProgressError,
+    refetch: refetchInProgress,
+  } = useQuery(TasksDocument, {
+    variables: {
+      page: 1,
+      limit: 50,
+      search: search || undefined,
+      priority: priorityFilter === "ALL" ? undefined : priorityFilter,
+      boardId: boardId || undefined,
+      status: "IN_PROGRESS",
+    },
+    skip: skip || !boardId,
+  });
+
+  const {
+    data: reviewData,
+    loading: reviewLoading,
+    error: reviewError,
+    refetch: refetchReview,
+  } = useQuery(TasksDocument, {
+    variables: {
+      page: 1,
+      limit: 50,
+      search: search || undefined,
+      priority: priorityFilter === "ALL" ? undefined : priorityFilter,
+      boardId: boardId || undefined,
+      status: "REVIEW",
+    },
+    skip: skip || !boardId,
+  });
+
+  const {
+    data: doneData,
+    loading: doneLoading,
+    error: doneError,
+    refetch: refetchDone,
+  } = useQuery(TasksDocument, {
+    variables: {
+      page: 1,
+      limit: 50,
+      search: search || undefined,
+      priority: priorityFilter === "ALL" ? undefined : priorityFilter,
+      boardId: boardId || undefined,
+      status: "DONE",
+    },
+    skip: skip || !boardId,
+  });
+
+  const kanbanTasksLoading = todoLoading || inProgressLoading || reviewLoading || doneLoading;
+  const kanbanTasksError = todoError || inProgressError || reviewError || doneError;
+
+  const refetchKanbanTasks = async () => {
+    await Promise.all([
+      refetchTodo(),
+      refetchInProgress(),
+      refetchReview(),
+      refetchDone(),
+    ]);
+  };
+
   const filteredTasks = useMemo(() => {
-    return (kanbanTasksData?.tasks?.data ?? []) as Task[];
-  }, [kanbanTasksData]);
+    return [
+      ...(todoData?.tasks?.data ?? []),
+      ...(inProgressData?.tasks?.data ?? []),
+      ...(reviewData?.tasks?.data ?? []),
+      ...(doneData?.tasks?.data ?? []),
+    ] as Task[];
+  }, [todoData, inProgressData, reviewData, doneData]);
 
   const [optimisticTasks, setOptimisticTasks] = useOptimistic(
     filteredTasks,
