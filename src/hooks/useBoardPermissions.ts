@@ -12,6 +12,7 @@ export function useBoardPermissions(
       return {
         currentMember: undefined,
         userBoardRole: undefined,
+        isViewer: false,
         canEditTasks: false,
         canManageBoard: false,
         isBoardOwner: false,
@@ -23,10 +24,13 @@ export function useBoardPermissions(
     );
     const userBoardRole = currentMember?.role;
 
+    // VIEWER board role is explicitly read-only — they cannot create, edit, or move tasks
+    const isViewer = userBoardRole === "VIEWER";
+
     const canEditTasks =
       user.role === "ADMIN" ||
       userBoardRole === "OWNER" ||
-      userBoardRole === "MEMBER";
+      userBoardRole === "MEMBER"; // VIEWER intentionally excluded
 
     const canManageBoard =
       user.role === "ADMIN" ||
@@ -38,6 +42,7 @@ export function useBoardPermissions(
     return {
       currentMember,
       userBoardRole,
+      isViewer,
       canEditTasks,
       canManageBoard,
       isBoardOwner,

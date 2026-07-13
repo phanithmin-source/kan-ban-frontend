@@ -80,7 +80,7 @@ export function useBoardPage(boardId: string) {
   });
 
   // ── Permissions ──────────────────────────────────────────────────────────────
-  const { canEditTasks, canManageBoard, isBoardOwner, userBoardRole } = useBoardPermissions(board, user);
+  const { canEditTasks, canManageBoard, isBoardOwner, isViewer, userBoardRole } = useBoardPermissions(board, user);
 
   // ── Operational hooks ────────────────────────────────────────────────────────
   const {
@@ -236,6 +236,7 @@ export function useBoardPage(boardId: string) {
     canEditTasks,
     canManageBoard,
     isBoardOwner,
+    isViewer,
     userBoardRole,
     // member actions
     updateBoardMemberRole,

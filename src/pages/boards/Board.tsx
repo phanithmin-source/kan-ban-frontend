@@ -33,6 +33,7 @@ export default function Board({ boardId }: { boardId: string }) {
     canEditTasks,
     canManageBoard,
     isBoardOwner,
+    isViewer,
     userBoardRole,
     updateBoardMemberRole,
     removeBoardMember,
@@ -128,6 +129,26 @@ export default function Board({ boardId }: { boardId: string }) {
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
+
+      {isViewer && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "10px 16px",
+            marginBottom: "12px",
+            background: "rgba(99,102,241,0.08)",
+            border: "1px solid rgba(99,102,241,0.25)",
+            borderRadius: "8px",
+            color: "#a5b4fc",
+            fontSize: "0.875rem",
+          }}
+        >
+          <span style={{ fontSize: "1rem" }}>👁️</span>
+          <span>You have <strong>read-only</strong> access to this board. Contact the board owner to request edit access.</span>
+        </div>
+      )}
 
       <BoardContent
         viewMode={viewMode}
